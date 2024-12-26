@@ -18,10 +18,10 @@ The project is fully open-source and can be built using common materials and com
 ## Hardware Requirements
 
 - **3D Printed Parts:** Designed for an Ender3 printer. CAD files are in Inventor format, with STLs provided.  
-- **Fasteners:**
-  - 2 × M3x5mm bolts  
+- **Fasteners:** (items marked with '[!]' are optional, and could be replaced with hot glue.)
+  - 2 × M3x5mm bolts  [!]
   - 4 × M3x8mm bolts  
-  - 4 × M2x5mm bolts  
+  - 4 × M2x3mm bolts  [!]
 - **Electronics:**
   - Adafruit Feather ESP32-S3 (2MB PSRAM)  
   - Adafruit 2.8" ILI9341 TFT Resistive Touch Display  
