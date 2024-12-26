@@ -31,3 +31,5 @@ void ScreenManager::getTouchPoints(int16_t& x, int16_t& y, int16_t& z) {
   //Serial.print(", Z=");
   //Serial.println(z);
 }
+
+//TODO add main loop that runs on different thread for GUI handling?
