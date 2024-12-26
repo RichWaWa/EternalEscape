@@ -9,7 +9,8 @@ The project is fully open-source and can be built using common materials and com
 ## Features
 
 - **Random Maze Generation:** Creates unique mazes endlessly.  
-- **Real-Time Maze Solving:** Watch as the algorithm finds its way out, again and again.  
+- **Real-Time Maze Solving:** Watch as the algorithm finds its way out, again and again.
+- **"Fight" Mode:** Watch two algorithms "Fight" each other in the maze. 
 - **Compact Design:** Fully 3D printable with common hardware components.  
 - **Expandable Functionality:** Networking and a settings GUI are planned for future updates.  
 
@@ -24,28 +25,29 @@ The project is fully open-source and can be built using common materials and com
   - 4 × M2x3mm bolts  [!]
 - **Electronics:**
   - Adafruit Feather ESP32-S3 (2MB PSRAM)  
-  - Adafruit 2.8" ILI9341 TFT Resistive Touch Display  
+  - Adafruit 2.8" ILI9341 TFT Resistive Touch Display
+  - Female-to-female jumpers or wire.  
 
 ---
 
 ## Software
 
-All source code is written in **C++** for efficient and robust performance. Future updates will include networking capabilities and a GUI for adjusting device settings.
+All source code is written in **C++**. Future updates will include networking capabilities and a GUI for adjusting device settings.
 
 ---
 
 ## Assembly
 
 1. **Print the Parts:** Use the provided STL files to 3D print all necessary components.  
-2. **Hardware Assembly:** Secure the parts using the listed bolts.  
+2. **Hardware Assembly:** Secure the parts using the listed bolts or hot glue.  
 3. **Connect Electronics:** Follow the wiring diagram (to be added) to connect the display to the ESP32-S3.  
-4. **Upload the Code:** Flash the provided C++ code to the ESP32-S3 using your preferred IDE.  
+4. **Upload the Code:** Flash the provided C++ code to the ESP32-S3 using PlatformIO for VScode
 
 ---
 
 ## Future Roadmap
 
-- **Networking:** Enable cloud-based maze sharing or remote control.  
+- **Networking:** Idk What id do with this, but its something im thinking about.
 - **Customizable Settings:** Implement a GUI for adjusting speed, maze size, and algorithm behavior.  
 
 ---
