@@ -19,11 +19,22 @@ Adafruit_NeoPixel pixels(NUMPIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 int colorIndex = 0;
 uint16_t colors[] = {ILI9341_RED, ILI9341_GREEN, ILI9341_BLUE};
 
+//State Machine for Display
+enum State { STROBING, SETTINGS };
+State currentState = STROBING;
+unsigned long touchStartTime = 0;
+bool touchHeld = false;
+//state machine debounce variables
+static unsigned long lastTouchEndTime = 0; // Tracks when the touch was last released
+static unsigned long lastValidTouchTime = 0; //Tracks the last time a valid touch was registered.
+static bool debounceInProgress = false;   // Tracks if debounce is active
+void updateStateMachine();  //update state machine function
+
 //Program setup
 void setup() {
   Serial.begin(115200);
   analogReadResolution(10);
-  Serial.println("Initializing Display, NeoPixel, and Touchscreen");
+  Serial.println("Initializing");
 
   // Initialize the TFT display
   screen.init();
@@ -33,25 +44,87 @@ void setup() {
   pixels.show(); // Turn off all pixels at startup
 }
 
+////////////////////////////////////////////////////
+//Main Program Loop
+////////////////////////////////////////////////////
 void loop() {
+  static unsigned long strobeTimer = 0;
   //get the touchpoints from the display
   screen.getTouchPoints(x,y,z);
-  
-  // If the screen is touched
-  if (z > MINPRESSURE && z < MAXPRESSURE) {
-    // Cycle to the next color
-    colorIndex = (colorIndex + 1) % 3; // Cycle through 0, 1, 2
-    uint16_t currentColor = colors[colorIndex];
+  updateStateMachine();
 
-    // Update the display and NeoPixel
-    screen.drawFillScreen(currentColor);
-    switch (colorIndex) {
-      case 0: pixels.setPixelColor(0, pixels.Color(255, 0, 0)); break; // Red
-      case 1: pixels.setPixelColor(0, pixels.Color(0, 255, 0)); break; // Green
-      case 2: pixels.setPixelColor(0, pixels.Color(0, 0, 255)); break; // Blue
-    }
-    pixels.show();
-    // Debounce delay
-    delay(300);
+  ////////////////////////////////////////////////////
+  //Update display Into Maze or Settings mode
+  ////////////////////////////////////////////////////
+
+  //Settings
+  if (currentState == SETTINGS) {
+        screen.drawSettingsScreen("00:11:22:33:44:55");
   }
-}
+  //Maze
+  if (currentState == STROBING) {
+    if (millis() - strobeTimer >= 1000) {
+      strobeTimer = millis();
+
+      static int colorIndex = 0;
+      uint16_t colors[] = {ILI9341_RED, ILI9341_GREEN, ILI9341_BLUE};
+      screen.drawStrobeScreen(colors[colorIndex]);
+
+      switch (colorIndex) {
+        case 0: pixels.setPixelColor(0, pixels.Color(255, 0, 0)); break;
+        case 1: pixels.setPixelColor(0, pixels.Color(0, 255, 0)); break;
+        case 2: pixels.setPixelColor(0, pixels.Color(0, 0, 255)); break;
+      }
+      pixels.show();
+      colorIndex = (colorIndex + 1) % 3;
+    }
+  }//END Display Screen updates
+}//End Main loop
+
+////////////////////////////////////////////////////
+//Function Declarations
+////////////////////////////////////////////////////
+
+//State Machine updates for display
+void updateStateMachine() {
+  static int holdToggleValue = 3000;        //value for how long you need to hold on the display to access the settings.
+  static int debounceDelay = 500;           //delay for the touch debounce.
+
+
+  // Check if the touch is within the valid range
+  if (z > MINPRESSURE && z < MAXPRESSURE) {
+    lastValidTouchTime = millis(); //update the last valid touch time
+    if (!touchHeld) {
+      // Start timing when touch is first detected
+      touchStartTime = millis();
+      touchHeld = true;
+    } else if (!debounceInProgress && millis() - touchStartTime >= holdToggleValue) {
+      // User has consistently held touch for 3 seconds, without debounce
+      debounceInProgress = true; // Begin debounce to prevent multiple triggers
+      touchHeld = false;         // Reset touchHeld to prepare for next touch
+      lastTouchEndTime = millis();
+
+      // Toggle the state machine
+      if (currentState == STROBING) {
+        currentState = SETTINGS;
+      } else {
+        currentState = STROBING;
+      }
+    }
+  } else {
+    // No touch detected 
+    //Has there been no touch detected for longer than the debounce delay?
+    if((millis() - lastValidTouchTime) >= debounceDelay){
+      if (touchHeld) {
+        // Reset if touch is released before the hold duration is reached
+        touchHeld = false;
+        touchStartTime = 0;
+      }
+      // Ensure a debounce delay before allowing another touch event
+      if (debounceInProgress && millis() - lastTouchEndTime >= debounceDelay) { // debounce
+        debounceInProgress = false;
+      }
+    }
+  }
+Serial.println(touchHeld);  //DEBUG STATEMENT
+}//END State machine block
