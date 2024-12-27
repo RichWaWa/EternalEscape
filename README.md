@@ -60,4 +60,4 @@ Contributions are welcome! Feel free to submit issues or pull requests to help m
 
 ## License
 
-This project is licensed under the MIT License. See `LICENSE` for details.
+This project is licensed under the TODO License. See `LICENSE` for details.
