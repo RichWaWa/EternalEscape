@@ -1,5 +1,6 @@
 #include "screen.h"
 
+
 //Constructor
 ScreenManager::ScreenManager() 
   //Member initializer list
@@ -11,7 +12,7 @@ ScreenManager::ScreenManager()
 //Initialize Display
 void ScreenManager::init() {
   tft.begin(SPI_FREQUENCY);
-  tft.setRotation(1);
+  tft.setRotation(3);
   tft.fillScreen(ILI9341_BLACK);
 }
 

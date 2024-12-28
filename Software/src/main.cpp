@@ -1,7 +1,8 @@
 #include <Adafruit_ILI9341.h> // Include the Adafruit ILI9341 library
 #include <Adafruit_NeoPixel.h> // Include the NeoPixel library
 #include "TouchScreen.h" // Include the Adafruit Touchscreen library
-#include "screen.h"
+#include "screen.h"     //screen class
+#include "networking.h" //Networking class
 
 // Pin definitions
 #define NEOPIXEL_PIN 33        // Pin for the onboard NeoPixel
@@ -30,6 +31,9 @@ static unsigned long lastValidTouchTime = 0; //Tracks the last time a valid touc
 static bool debounceInProgress = false;   // Tracks if debounce is active
 void updateStateMachine();  //update state machine function
 
+//Mac address
+String macAddr;
+
 //Program setup
 void setup() {
   Serial.begin(115200);
@@ -42,6 +46,9 @@ void setup() {
   // Initialize the NeoPixel
   pixels.begin();
   pixels.show(); // Turn off all pixels at startup
+
+  //Get MAC address
+  macAddr = getMACAddress();
 }
 
 ////////////////////////////////////////////////////
@@ -59,7 +66,7 @@ void loop() {
 
   //Settings
   if (currentState == SETTINGS) {
-        screen.drawSettingsScreen("00:11:22:33:44:55");
+        screen.drawSettingsScreen(macAddr);
   }
   //Maze
   if (currentState == STROBING) {
@@ -80,6 +87,7 @@ void loop() {
     }
   }//END Display Screen updates
 }//End Main loop
+
 
 ////////////////////////////////////////////////////
 //Function Declarations
