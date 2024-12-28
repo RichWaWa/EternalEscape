@@ -5,8 +5,8 @@
 Adafruit_ILI9341 tft(TFT_CS, TFT_DC, TFT_RST);  // Initialize tft with required pin values
 TouchScreen ts(TS_XP, TS_YP, TS_XM, TS_YM, TS_RES);  // Initialize ts with required pin values and resistance
 //Brightness button Variables
-const int16_t rectX = 180;   // X-coordinate of the rectangle
-const int16_t rectY = 140;   // Y-coordinate of the rectangle
+const int16_t rectX = 150;   // X-coordinate of the rectangle
+const int16_t rectY = 133;   // Y-coordinate of the rectangle
 const int16_t rectWidth = 60;  // Width of the rectangle
 const int16_t rectHeight = 30; // Height of the rectangle
 
