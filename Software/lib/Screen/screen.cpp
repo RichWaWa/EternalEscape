@@ -5,15 +5,19 @@
 Adafruit_ILI9341 tft(TFT_CS, TFT_DC, TFT_RST);  // Initialize tft with required pin values
 TouchScreen ts(TS_XP, TS_YP, TS_XM, TS_YM, TS_RES);  // Initialize ts with required pin values and resistance
 String brightnessLevel = "HI";      // Default brightness level
-int brightnessPWM = 255;              //Default brightness PWM
+int brightnessPWM = 255;            //Default brightness PWM
 bool wifiStatusLast = false;        //tracks whether the wifi status has changed or not
-String brightnessLevelLast = "";
+String brightnessLevelLast = "";    
+// Debounce tracking variables
+unsigned long lastTouchTime = 0;
+const unsigned long debounceDelay = 300; // 300ms debounce delay
 
 // Initialize Display
 void initScreen() {
     tft.begin(SPI_FREQUENCY);
-    tft.setRotation(3);
-    tft.fillScreen(ILI9341_BLACK);
+    tft.setRotation(3); //sets the correct screen orientation. (SD card facing down. If you didnt do this, set it to 1)
+    tft.fillScreen(ILI9341_BLACK);  
+    pinMode(TFT_LITE, OUTPUT); //set the PWM output for the backlight
 }
 
 // Draw the settings screen
@@ -37,14 +41,12 @@ void drawSettingsScreen(const String& macAddress, bool wifiStatus) {
 
     // Draw brightness toggle
     brightnessLevel = loadBrightness(); //load the brightness from the settings
-    drawText("Brightness:", 10, 140, ILI9341_WHITE);
-    drawFillRectangle(180, 140, 60, 30, ILI9341_WHITE);  // Outline rectangle
-    drawTextCentered(brightnessLevel.c_str(), 210, 155, ILI9341_BLACK);
+    checkBrightnessButtonTouch(0, 0, 0); //I use this function to just load the box initially. Setting the arguments to just zeros so it doesnt do anything
     brightnessLevelLast = brightnessLevel;
 }
 
 // Update the settings screen (partial updates only)
-void updateSettingsScreen(bool wifiStatus) {
+void updateSettingsScreen(int16_t x, int16_t y, int16_t z ,bool wifiStatus) {
     // Update wifi status only if it has changed
     if (wifiStatus != wifiStatusLast) {
         if (wifiStatus) {
@@ -57,9 +59,7 @@ void updateSettingsScreen(bool wifiStatus) {
 
     // Update brightness level only if it has changed
     if (brightnessLevel != brightnessLevelLast) {
-        drawFillRectangle(180, 140, 60, 30, ILI9341_BLACK);  // Clear the previous rectangle
-        drawFillRectangle(180, 140, 60, 30, ILI9341_WHITE);      // Redraw outline rectangle
-        drawTextCentered(brightnessLevel.c_str(), 210, 155, ILI9341_BLACK);
+        checkBrightnessButtonTouch(x, y, z);
         brightnessLevelLast = brightnessLevel;
     }
 }
@@ -79,6 +79,37 @@ void getTouchPoints(int16_t& x, int16_t& y, int16_t& z) {
     //Serial.println(z);
 }
 
+// Check if the brightness button has been toggled
+void checkBrightnessButtonTouch(int16_t x, int16_t y, int16_t z) {
+    // Define rectangle bounds
+    const int16_t rectX = 180;   // X-coordinate of the rectangle
+    const int16_t rectY = 140;   // Y-coordinate of the rectangle
+    const int16_t rectWidth = 60;  // Width of the rectangle
+    const int16_t rectHeight = 30; // Height of the rectangle
+
+    // Check for valid touch input
+    if (z > MINPRESSURE && z < MAXPRESSURE) {
+        // Check if the touch is within the rectangle bounds
+        if (x >= rectX && x <= (rectX + rectWidth) &&
+            y >= rectY && y <= (rectY + rectHeight)) {
+            
+            // Check for debounce
+            unsigned long currentTime = millis();
+            if (currentTime - lastTouchTime > debounceDelay) {
+                // Toggle brightness level
+                toggleBrightness(); // Call your brightness toggle function here
+
+                // Update the brightness level on the screen
+                drawFillRectangle(rectX, rectY, rectWidth, rectHeight, ILI9341_WHITE); // Redraw rectangle
+                drawTextCentered(brightnessLevel.c_str(), rectX + (rectWidth / 2), rectY + (rectHeight / 2), ILI9341_BLACK);
+
+                // Update debounce timer
+                lastTouchTime = currentTime;
+            }
+        }
+    }
+}
+
 // Draw Strobe Screen
 void drawStrobeScreen(uint16_t color) {
     tft.fillScreen(color);
@@ -96,12 +127,8 @@ void toggleBrightness() {
         brightnessLevel = "HI";
         brightnessPWM = 255;    // 3/3 of 255
     }
-    saveBrightness(brightnessLevel);
-}
-
-// Get the current brightness level
-const int getBrightnessPWM() {
-    return brightnessPWM;
+    //saveBrightness(brightnessLevel);    //save to settings
+    analogWrite(TFT_LITE, brightnessPWM);   //set brightness level
 }
 
 // Utility functions

@@ -76,7 +76,7 @@ void loop() {
       settingsOpenLast = true;  //update to true to indicate its been run initially
     }else{
       //otherwise, we know everything else is drawn so we can just update it.
-      updateSettingsScreen(isWiFiConnected);
+      updateSettingsScreen(x, y, z, isWiFiConnected);
     }
     
   }else{
