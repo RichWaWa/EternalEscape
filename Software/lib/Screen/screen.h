@@ -5,6 +5,7 @@
 #include "TouchScreen.h"
 
 // TFT display pin definitions
+#define TFT_LITE 10            // Backlight brightness control pin (Drive with PWM)
 #define TFT_CS 9               // Chip select control pin
 #define TFT_DC 6               // Data Command control pin
 #define TFT_RST 5              // Reset pin (could connect to RST pin)
@@ -28,24 +29,20 @@
 #define MINPRESSURE 100
 #define MAXPRESSURE 10000
 
-class ScreenManager {
-public:
-    ScreenManager();
-    void init();
-    void getTouchPoints(int16_t& x, int16_t& y, int16_t& z);
-    void drawStrobeScreen(uint16_t color);
-    void drawSettingsScreen(const String& macAddress);
-    void toggleBrightness();
-    const String& getBrightnessLevel() const;
+// Initialization functions
+void initScreen();
+void getTouchPoints(int16_t& x, int16_t& y, int16_t& z);
 
-private:
-    Adafruit_ILI9341 tft;
-    TouchScreen ts;
-    String brightnessLevel;
+// Screen drawing functions
+void drawStrobeScreen(uint16_t color);
+void drawSettingsScreen(const String& macAddress, bool wifiStatus);
+void updateSettingsScreen(bool wifiStatus);
+void toggleBrightness();
+String getBrightnessLevel();
 
-    void drawText(const char* text, int16_t x, int16_t y, uint16_t color);
-    void drawRectangle(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
-    void drawTextCentered(const char* text, int16_t centerX, int16_t centerY, uint16_t color);
-};
+// Helper functions
+void drawText(const char* text, int16_t x, int16_t y, uint16_t color);
+void drawFillRectangle(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+void drawTextCentered(const char* text, int16_t centerX, int16_t centerY, uint16_t color);
 
 #endif // SCREEN_H

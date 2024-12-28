@@ -7,5 +7,10 @@ String getMACAddress() {
 
 // Function to check Wi-Fi connection status
 bool isWiFiConnected() {
-    return WiFi.status() == WL_CONNECTED; // Returns true if connected, false otherwise
+     // Returns true if connected, false otherwise
+    if(WiFi.status() == WL_CONNECTED){
+        return true;
+    }else{
+        return false;
+    }
 }

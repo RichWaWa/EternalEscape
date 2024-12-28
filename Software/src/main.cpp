@@ -3,17 +3,17 @@
 #include "TouchScreen.h" // Include the Adafruit Touchscreen library
 #include "screen.h"     //screen class
 #include "networking.h" //Networking class
+#include "settings.h"   //store device settings
 
 // Pin definitions
 #define NEOPIXEL_PIN 33        // Pin for the onboard NeoPixel
 #define NUMPIXELS 1            // Number of NeoPixels on the board
 
-// Screen instance and variables
+//Touch screen variables
 int16_t x, y, z;
-ScreenManager screen = ScreenManager();
 
 // Create instances for the display and NeoPixel
-Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
+//Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
 Adafruit_NeoPixel pixels(NUMPIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 // Global variables for color cycling
@@ -21,8 +21,8 @@ int colorIndex = 0;
 uint16_t colors[] = {ILI9341_RED, ILI9341_GREEN, ILI9341_BLUE};
 
 //State Machine for Display
-enum State { STROBING, SETTINGS };
-State currentState = STROBING;
+enum State { MAZESCREEN, SETTINGS };
+State currentState = MAZESCREEN;
 unsigned long touchStartTime = 0;
 bool touchHeld = false;
 //state machine debounce variables
@@ -34,6 +34,10 @@ void updateStateMachine();  //update state machine function
 //Mac address
 String macAddr;
 
+//Variables for tracking the first function call for the settings or the Maze Screen
+bool settingsOpenLast = false;  //is the settings screen previously open?
+bool mazeScreenOpenLast = false; //is the maze screen previously open?
+
 //Program setup
 void setup() {
   Serial.begin(115200);
@@ -41,7 +45,7 @@ void setup() {
   Serial.println("Initializing");
 
   // Initialize the TFT display
-  screen.init();
+  initScreen();
 
   // Initialize the NeoPixel
   pixels.begin();
@@ -57,7 +61,7 @@ void setup() {
 void loop() {
   static unsigned long strobeTimer = 0;
   //get the touchpoints from the display
-  screen.getTouchPoints(x,y,z);
+  getTouchPoints(x,y,z);
   updateStateMachine();
 
   ////////////////////////////////////////////////////
@@ -66,16 +70,36 @@ void loop() {
 
   //Settings
   if (currentState == SETTINGS) {
-        screen.drawSettingsScreen(macAddr);
+    if(!settingsOpenLast){
+      //draw everything the first go around
+      drawSettingsScreen(macAddr, isWiFiConnected);
+      settingsOpenLast = true;  //update to true to indicate its been run initially
+    }else{
+      //otherwise, we know everything else is drawn so we can just update it.
+      updateSettingsScreen(isWiFiConnected);
+    }
+    
+  }else{
+    settingsOpenLast = false; //settings tab closed
   }
   //Maze
-  if (currentState == STROBING) {
-    if (millis() - strobeTimer >= 1000) {
+  if (currentState == MAZESCREEN) {
+    if(!mazeScreenOpenLast){
+      //draw the maze initially
+
+
+      //run last
+      mazeScreenOpenLast = true;  //update to true to indicate its been run initially
+    }else{
+      //update the maze as the player moves here.
+
+
+      if (millis() - strobeTimer >= 1000) {
       strobeTimer = millis();
 
       static int colorIndex = 0;
       uint16_t colors[] = {ILI9341_RED, ILI9341_GREEN, ILI9341_BLUE};
-      screen.drawStrobeScreen(colors[colorIndex]);
+      drawStrobeScreen(colors[colorIndex]);
 
       switch (colorIndex) {
         case 0: pixels.setPixelColor(0, pixels.Color(255, 0, 0)); break;
@@ -84,7 +108,10 @@ void loop() {
       }
       pixels.show();
       colorIndex = (colorIndex + 1) % 3;
-    }
+      }
+    }//end open last else
+  }else{
+    mazeScreenOpenLast = false; //maze screen closed
   }//END Display Screen updates
 }//End Main loop
 
@@ -113,10 +140,10 @@ void updateStateMachine() {
       lastTouchEndTime = millis();
 
       // Toggle the state machine
-      if (currentState == STROBING) {
+      if (currentState == MAZESCREEN) {
         currentState = SETTINGS;
       } else {
-        currentState = STROBING;
+        currentState = MAZESCREEN;
       }
     }
   } else {
