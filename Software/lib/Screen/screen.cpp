@@ -4,6 +4,12 @@
 // Global variables for TFT and touchscreen
 Adafruit_ILI9341 tft(TFT_CS, TFT_DC, TFT_RST);  // Initialize tft with required pin values
 TouchScreen ts(TS_XP, TS_YP, TS_XM, TS_YM, TS_RES);  // Initialize ts with required pin values and resistance
+//Brightness button Variables
+const int16_t rectX = 180;   // X-coordinate of the rectangle
+const int16_t rectY = 140;   // Y-coordinate of the rectangle
+const int16_t rectWidth = 60;  // Width of the rectangle
+const int16_t rectHeight = 30; // Height of the rectangle
+
 String brightnessLevel = "HI";      // Default brightness level
 int brightnessPWM = 255;            //Default brightness PWM
 bool wifiStatusLast = false;        //tracks whether the wifi status has changed or not
@@ -41,7 +47,9 @@ void drawSettingsScreen(const String& macAddress, bool wifiStatus) {
 
     // Draw brightness toggle
     brightnessLevel = loadBrightness(); //load the brightness from the settings
-    checkBrightnessButtonTouch(0, 0, 0); //I use this function to just load the box initially. Setting the arguments to just zeros so it doesnt do anything
+    drawText("Brightness:", 10, 140, ILI9341_WHITE);
+    drawFillRectangle(rectX, rectY, rectWidth, rectHeight, ILI9341_WHITE); //draw button
+    drawTextCentered(brightnessLevel.c_str(), rectX + (rectWidth / 2), rectY + (rectHeight / 2), ILI9341_BLACK);//add text
     brightnessLevelLast = brightnessLevel;
 }
 
@@ -81,11 +89,6 @@ void getTouchPoints(int16_t& x, int16_t& y, int16_t& z) {
 
 // Check if the brightness button has been toggled
 void checkBrightnessButtonTouch(int16_t x, int16_t y, int16_t z) {
-    // Define rectangle bounds
-    const int16_t rectX = 180;   // X-coordinate of the rectangle
-    const int16_t rectY = 140;   // Y-coordinate of the rectangle
-    const int16_t rectWidth = 60;  // Width of the rectangle
-    const int16_t rectHeight = 30; // Height of the rectangle
 
     // Check for valid touch input
     if (z > MINPRESSURE && z < MAXPRESSURE) {
