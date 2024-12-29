@@ -8,10 +8,13 @@ https://weblog.jamisbuck.org/2011/1/10/maze-generation-prim-s-algorithm
 https://github.com/jamis/csmazes
 */
 
+
 void generateMaze(char maze[31][41]) {
+    const int mazeHeight = 31;
+    const int mazeWidth = 41;
     // Copy the maze template
-    for (int row = 0; row < 31; ++row) {
-        for (int col = 0; col < 41; ++col) {
+    for (int row = 0; row < mazeHeight; ++row) {
+        for (int col = 0; col < mazeWidth; ++col) {
             maze[row][col] = mazeTemplate[row][col];
         }
     }
@@ -32,24 +35,65 @@ void generateMaze(char maze[31][41]) {
 
     // Helper function to check if a position is valid
     auto isValid = [&](int row, int col) {
-        return row > 0 && row < 30 && col > 0 && col < 40 &&
+        return row > 0 && row < mazeHeight && col > 0 && col < mazeWidth &&
                maze[row][col] == '#' && maze[row][col] != 'C';
     };
 
     // Find the starting position (a '.' on the maze template)
+    // Find a random starting position (a '.' on the maze template)
     Cell start;
     bool foundStart = false;
-    for (int row = 1; row < 30 && !foundStart; ++row) {
-        for (int col = 1; col < 40 && !foundStart; ++col) {
-            if (maze[row][col] == '.') {
-                start = {row, col};
-                foundStart = true;
-            }
+    while (!foundStart) {
+        // Randomly choose a row and column within the bounds
+        int row = 1 + rand() % (mazeHeight - 2); // Rows between 1 and 30
+        int col = 1 + rand() % (mazeWidth - 2); // Columns between 1 and 40
+
+        // Check if the selected cell is a valid starting point
+        if (maze[row][col] == '.') {
+            start = {row, col};
+            foundStart = true;
         }
     }
-
     // Mark the starting point with 'S'
     maze[start.row][start.col] = 'S';
+
+    // Place an exit ('E') on a border wall
+    //place exit(Gotta make sure the algo can work around this too)
+    bool exitPlaced = false;
+
+    while (!exitPlaced) {
+        // Randomly select one of the edge regions
+        int edge = rand() % 4; // 0: first row, 1: last row, 2: first column, 3: last column
+        int row, col;
+
+        switch (edge) {
+            case 0: // First row (row 1, columns 1-40)
+                row = 1;
+                col = 1 + rand() % (mazeWidth - 2); // Columns 1 to 40
+                break;
+
+            case 1: // Last row (row 30, columns 1-40)
+                row = 30;
+                col = 1 + rand() % (mazeWidth - 2); // Columns 1 to 40
+                break;
+
+            case 2: // First column (rows 1-30, column 1)
+                row = 1 + rand() % (mazeHeight - 2); // Rows 1 to 29
+                col = 1;
+                break;
+
+            case 3: // Last column (rows 1-30, column 40)
+                row = 1 + rand() % (mazeHeight - 2); // Rows 1 to 30
+                col = 40;
+                break;
+        }
+
+        // Check if the selected position is a valid path
+        if (maze[row][col] == '.') {
+            maze[row][col] = 'E'; // Place the exit
+            exitPlaced = true;
+        }
+    }
 
     // Add neighboring walls of the start cell to the walls list
     for (const auto& dir : directions) {
@@ -72,8 +116,8 @@ void generateMaze(char maze[31][41]) {
             int oppositeRow = wall.row + dir.row;
             int oppositeCol = wall.col + dir.col;
 
-            if (oppositeRow > 0 && oppositeRow < 30 &&
-                oppositeCol > 0 && oppositeCol < 40 &&
+            if (oppositeRow > 0 && oppositeRow < (mazeHeight - 2) &&
+                oppositeCol > 0 && oppositeCol < (mazeWidth - 2) &&
                 maze[oppositeRow][oppositeCol] == '.') {
                 
                 // Carve path through the wall and mark it as path
@@ -92,15 +136,6 @@ void generateMaze(char maze[31][41]) {
                 }
                 break;
             }
-        }
-    }
-
-    // Place an exit ('E') on a border wall
-    bool exitPlaced = false;
-    for (int col = 1; col < 40 && !exitPlaced; ++col) {
-        if (maze[30][col] == '*') {
-            maze[30][col] = 'E';
-            exitPlaced = true;
         }
     }
 }

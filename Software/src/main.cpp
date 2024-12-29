@@ -67,11 +67,9 @@ void loop() {
   //get the touchpoints from the display
   getTouchPoints(x,y,z); 
   updateStateMachine();
-
   ////////////////////////////////////////////////////
   //Update display Into Maze or Settings mode
   ////////////////////////////////////////////////////
-
   //Settings
   if (currentState == SETTINGS) {
     if(!settingsOpenLast){
@@ -119,7 +117,6 @@ void loop() {
   }//END Display Screen updates
 }//End Main loop
 
-
 ////////////////////////////////////////////////////
 //Function Declarations
 ////////////////////////////////////////////////////
@@ -128,8 +125,6 @@ void loop() {
 void updateStateMachine() {
   static int holdToggleValue = 3000;        //value for how long you need to hold on the display to access the settings.
   static int debounceDelay = 500;           //delay for the touch debounce.
-
-
   // Check if the touch is within the valid range
   if (z > MINPRESSURE && z < MAXPRESSURE) {
     lastValidTouchTime = millis(); //update the last valid touch time
@@ -142,7 +137,6 @@ void updateStateMachine() {
       debounceInProgress = true; // Begin debounce to prevent multiple triggers
       touchHeld = false;         // Reset touchHeld to prepare for next touch
       lastTouchEndTime = millis();
-
       // Toggle the state machine
       if (currentState == MAZESCREEN) {
         currentState = SETTINGS;
@@ -170,7 +164,6 @@ void updateStateMachine() {
 //Debug statement
 void waitForSerial(unsigned long timeout) { //Waits for a serial connection before pursuing with the program (FOR DEBUG USE ONLY)
     unsigned long startTime = millis();
-
     // Wait for Serial to connect
     Serial.println("Waiting for serial connection...");
     while (!Serial) {
