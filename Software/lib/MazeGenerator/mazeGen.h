@@ -37,4 +37,8 @@ const char mazeTemplate[31][41] = {
     {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'}
 };//end mazeTemplate
 
+
+//maze generator functions
+void generateMaze(char maze[31][41]);
+
 #endif // MAZEGEN_H
