@@ -4,6 +4,7 @@
 #include "screen.h"     //screen class
 #include "networking.h" //Networking class
 #include "settings.h"   //store device settings
+#include "mazeGen.h"
 
 // Pin definitions
 #define NEOPIXEL_PIN 33        // Pin for the onboard NeoPixel
@@ -44,7 +45,7 @@ bool mazeScreenOpenLast = false; //is the maze screen previously open?
 void setup() {
   Serial.begin(115200);
   analogReadResolution(10);
-  waitForSerial();  //debug statement
+  waitForSerial();  //debug statement 
   // Initialize the TFT display
   initScreen();
 
