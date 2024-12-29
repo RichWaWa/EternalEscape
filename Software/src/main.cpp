@@ -30,6 +30,8 @@ static unsigned long lastTouchEndTime = 0; // Tracks when the touch was last rel
 static unsigned long lastValidTouchTime = 0; //Tracks the last time a valid touch was registered.
 static bool debounceInProgress = false;   // Tracks if debounce is active
 void updateStateMachine();  //update state machine function
+//generic function declerations
+void waitForSerial(unsigned long timeout = 10000);  //default value of 10000
 
 //Mac address
 String macAddr;
@@ -42,8 +44,7 @@ bool mazeScreenOpenLast = false; //is the maze screen previously open?
 void setup() {
   Serial.begin(115200);
   analogReadResolution(10);
-  Serial.println("Initializing");
-
+  waitForSerial();  //debug statement
   // Initialize the TFT display
   initScreen();
 
@@ -53,6 +54,8 @@ void setup() {
 
   //Get MAC address
   macAddr = getMACAddress();
+  //Connect to WiFi 
+  connectToWiFi();
 }
 
 ////////////////////////////////////////////////////
@@ -72,12 +75,11 @@ void loop() {
   if (currentState == SETTINGS) {
     if(!settingsOpenLast){
       //draw everything the first go around
-      drawSettingsScreen(macAddr, isWiFiConnected);
+      drawSettingsScreen(macAddr, isWiFiConnected());
       settingsOpenLast = true;  //update to true to indicate its been run initially
     }else{
       //otherwise, we know everything else is drawn so we can just update it.
-      updateSettingsScreen(x, y, z, isWiFiConnected);
-      Serial.println("Printing updateSettingsScreen");
+      updateSettingsScreen(x, y, z, isWiFiConnected());
     }
     
   }else{
@@ -162,5 +164,19 @@ void updateStateMachine() {
       }
     }
   }
-//Serial.println(touchHeld);  //DEBUG STATEMENT
 }//END State machine block
+
+//Debug statement
+void waitForSerial(unsigned long timeout) { //Waits for a serial connection before pursuing with the program (FOR DEBUG USE ONLY)
+    unsigned long startTime = millis();
+
+    // Wait for Serial to connect
+    Serial.println("Waiting for serial connection...");
+    while (!Serial) {
+        if (millis() - startTime > timeout) {
+            Serial.println("Serial connection timeout. Continuing without serial...");
+            return;
+        }
+    }
+    Serial.println("Serial connection established.");
+}//END waitForSerial

@@ -7,5 +7,7 @@
 String getMACAddress();
 // Function to check Wi-Fi connection status
 bool isWiFiConnected();
+// Function to connect to a wifi network
+void connectToWiFi();
 
 #endif // NETWORKING_H

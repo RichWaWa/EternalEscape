@@ -26,6 +26,7 @@ void initScreen() {
     pinMode(TFT_LITE, OUTPUT); //set the PWM output for the backlight
     //need to load the brightness from the settings
     analogWrite(TFT_LITE, brightnessPWM);   //set brightness level
+    loadingScreen();    //show the loading screen
 
 }
 
@@ -106,18 +107,11 @@ void getTouchPoints(int16_t& x, int16_t& y, int16_t& z) {
 
 // Check if the brightness button has been toggled
 void checkBrightnessButtonTouch(int16_t x, int16_t y, int16_t z) {
-    //Serial.print(x);
-    //Serial.print(" ,");
-    //Serial.print(y);
-    //Serial.print(" ,");
-    //Serial.println(z);
-
     // Check for valid touch input
     if (z > MINPRESSURE && z < MAXPRESSURE) {
         // Check if the touch is within the rectangle bounds
         if (x >= rectX && x <= (rectX + rectWidth) &&
             y >= rectY && y <= (rectY + rectHeight)) {
-            Serial.println("Brightness Button Touch Detected");
             // Check for debounce
             unsigned long currentTime = millis();
             if (currentTime - lastTouchTime > debounceDelay) {
@@ -139,6 +133,23 @@ void checkBrightnessButtonTouch(int16_t x, int16_t y, int16_t z) {
 void drawStrobeScreen(uint16_t color) {
     tft.fillScreen(color);
 }
+
+void loadingScreen() {
+    // Clear the screen
+    tft.fillScreen(ILI9341_BLACK);
+
+    // Draw "EternalEscape" text
+    tft.setTextSize(4);
+    tft.setFont();
+    tft.setTextColor(ILI9341_WHITE);
+    drawTextCentered("EternalEscape", tft.width() / 2, tft.height() / 2 - 20, ILI9341_WHITE);
+
+    // Draw "Loading..." text
+    tft.setTextSize(2);
+    tft.setTextColor(ILI9341_DARKGREY);
+    drawTextCentered("Loading...", tft.width() / 2, tft.height() / 2 + 20, ILI9341_DARKGREY);
+}
+
 
 // Toggle brightness levels
 void toggleBrightness() {
