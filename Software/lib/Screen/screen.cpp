@@ -24,14 +24,18 @@ void initScreen() {
     tft.setRotation(3); //sets the correct screen orientation. (SD card facing down. If you didnt do this, set it to 1)
     tft.fillScreen(ILI9341_BLACK);  
     pinMode(TFT_LITE, OUTPUT); //set the PWM output for the backlight
+    //need to load the brightness from the settings
+    analogWrite(TFT_LITE, brightnessPWM);   //set brightness level
+
 }
 
 // Draw the settings screen
 void drawSettingsScreen(const String& macAddress, bool wifiStatus) {
+    delay(10);  //Small delay to fix issue with Buffer not initializing correctly
     tft.fillScreen(ILI9341_BLACK);
 
     // Draw title
-    drawTextCentered("EternalEscape", tft.width() / 2, 10, ILI9341_WHITE);
+    drawTextCentered("EternalEscape", (tft.width() / 2), 10, ILI9341_WHITE);
 
     // Draw wifi status
     if (wifiStatus) {
@@ -66,8 +70,8 @@ void updateSettingsScreen(int16_t x, int16_t y, int16_t z ,bool wifiStatus) {
     }
 
     // Update brightness level only if it has changed
+    checkBrightnessButtonTouch(x, y, z);
     if (brightnessLevel != brightnessLevelLast) {
-        checkBrightnessButtonTouch(x, y, z);
         brightnessLevelLast = brightnessLevel;
     }
 }
@@ -75,10 +79,23 @@ void updateSettingsScreen(int16_t x, int16_t y, int16_t z ,bool wifiStatus) {
 // Get touch points
 void getTouchPoints(int16_t& x, int16_t& y, int16_t& z) {
     TSPoint touchPoint = ts.getPoint();
-    x = map(touchPoint.x, TS_MINX, TS_MAXX, 0, tft.width());
-    y = map(touchPoint.y, TS_MINY, TS_MAXY, 0, tft.height());
+    // Map x and y to origin at top left corner.
+    x = map(touchPoint.x, TS_MINY, TS_MAXY, 0, tft.width());        // X-axis: downwards
+    y = map(touchPoint.y, TS_MINX, TS_MAXX, 0, tft.height()); 
     z = abs(touchPoint.z);
-    Serial.print("Touch detected at: ");
+    y = tft.height() - y;   // Adjust Y-axis to invert it, leaving  Y-axis: rightwards
+
+    //Uncomment these lines to read the touchscreen printouts!
+    //Serial.print("Touch detected at: ");
+    //Serial.print("X=");
+    //Serial.print(touchPoint.x);
+    //Serial.print(", Y=");
+    //Serial.print(touchPoint.y);
+    //Serial.print(", Z=");
+    //Serial.println(touchPoint.z);
+
+    //These lines are to confirm the mapped touch points
+    //Serial.print("Mapped Touch detected at: ");
     //Serial.print("X=");
     //Serial.print(x);
     //Serial.print(", Y=");
@@ -89,13 +106,18 @@ void getTouchPoints(int16_t& x, int16_t& y, int16_t& z) {
 
 // Check if the brightness button has been toggled
 void checkBrightnessButtonTouch(int16_t x, int16_t y, int16_t z) {
+    //Serial.print(x);
+    //Serial.print(" ,");
+    //Serial.print(y);
+    //Serial.print(" ,");
+    //Serial.println(z);
 
     // Check for valid touch input
     if (z > MINPRESSURE && z < MAXPRESSURE) {
         // Check if the touch is within the rectangle bounds
         if (x >= rectX && x <= (rectX + rectWidth) &&
             y >= rectY && y <= (rectY + rectHeight)) {
-            
+            Serial.println("Brightness Button Touch Detected");
             // Check for debounce
             unsigned long currentTime = millis();
             if (currentTime - lastTouchTime > debounceDelay) {
@@ -149,9 +171,10 @@ void drawFillRectangle(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t colo
 void drawTextCentered(const char* text, int16_t centerX, int16_t centerY, uint16_t color) {
     int16_t x1, y1;
     uint16_t w, h;
+    tft.setTextSize(2); // Set the text first to ensure getTextBounds returns the correct value
+    tft.setFont();      // Ensure the default font is selected
     tft.getTextBounds(text, 0, 0, &x1, &y1, &w, &h);
     tft.setCursor(centerX - (w / 2), centerY - (h / 2));
     tft.setTextColor(color);
-    tft.setTextSize(2);
     tft.print(text);
 }

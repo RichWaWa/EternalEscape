@@ -5,11 +5,15 @@
 #include "TouchScreen.h"
 
 // TFT display pin definitions
-#define TFT_LITE 255            // Backlight brightness control pin (Drive with PWM)
+#define TFT_LITE 10           // Backlight brightness control pin (Drive with PWM)
 #define TFT_CS 9               // Chip select control pin
 #define TFT_DC 6               // Data Command control pin
 #define TFT_RST 5              // Reset pin (could connect to RST pin)
 #define SPI_FREQUENCY 40000000 // 40 MHz
+
+//TFT Display Size
+#define TFT_WIDTH 320
+#define TFT_HEIGHT 240
 
 // Touchscreen pin definitions
 #define TS_YP 14               // Y+ pin (must be an analog pin)
@@ -18,16 +22,17 @@
 #define TS_XM 17               // X- pin (must be an analog pin)
 
 // Touchscreen calibration values
-//TODO Figure out what these actually do.
-#define TS_MINX 150            // 150
-#define TS_MINY 120            // 120
-#define TS_MAXX 920            // 920
-#define TS_MAXY 940            // 940
+//These are needed to map the calibration values.
+//You WILL need to adjust these for your screen. See WIKI
+#define TS_MINX 806            // Default 150
+#define TS_MINY 810            // Default 120
+#define TS_MAXX 972            // Default 920
+#define TS_MAXY 983            // Default 940
 #define TS_RES 332             // Touch screen resistance (ADJUST FOR YOUR DISPLAY, But this value may be close enough!)
 // define valid pressure ranges to eliminate error
 // NOTE These will likely need to be adjusted for your display!!!
-#define MINPRESSURE 100
-#define MAXPRESSURE 10000
+#define MINPRESSURE 150
+#define MAXPRESSURE 3000
 
 // Initialization functions
 void initScreen();

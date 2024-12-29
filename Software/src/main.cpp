@@ -61,7 +61,7 @@ void setup() {
 void loop() {
   static unsigned long strobeTimer = 0;
   //get the touchpoints from the display
-  getTouchPoints(x,y,z);
+  getTouchPoints(x,y,z); 
   updateStateMachine();
 
   ////////////////////////////////////////////////////
@@ -77,6 +77,7 @@ void loop() {
     }else{
       //otherwise, we know everything else is drawn so we can just update it.
       updateSettingsScreen(x, y, z, isWiFiConnected);
+      Serial.println("Printing updateSettingsScreen");
     }
     
   }else{
@@ -161,5 +162,5 @@ void updateStateMachine() {
       }
     }
   }
-Serial.println(touchHeld);  //DEBUG STATEMENT
+//Serial.println(touchHeld);  //DEBUG STATEMENT
 }//END State machine block
