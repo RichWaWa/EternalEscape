@@ -166,7 +166,8 @@ void drawElement(int rowA, int colA, char cellType) {
     const uint16_t BLACK = 0x0000; 
     const uint16_t WHITE = 0xFFFF; 
     const uint16_t GREEN = 0x07E0; 
-    const uint16_t RED = 0xF800;   
+    const uint16_t RED = 0xF800; 
+    const uint16_t GREY = 0xC618; 
     const uint16_t DARKGREY = 0x7BEF;
 
     // Calculate the top-left pixel coordinates of the cell
@@ -201,7 +202,7 @@ void drawElement(int rowA, int colA, char cellType) {
             break;
 
         case 'S': // Start
-            drawFillRectangle(x, y, cellSize, cellSize, RED); // Red
+            drawFillRectangle(x, y, cellSize, cellSize, GREY); // Red
             break;
 
         default: // Default case (green 14x14)

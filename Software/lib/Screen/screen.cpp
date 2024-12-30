@@ -52,7 +52,7 @@ void drawSettingsScreen(const String& macAddress, bool wifiStatus) {
     drawText(macAddress.c_str(), 10, 80, ILI9341_WHITE);
 
     // Draw brightness toggle
-    brightnessLevel = loadBrightness(); //load the brightness from the settings
+    //brightnessLevel = loadBrightness(); //load the brightness from the settings
     drawText("Brightness:", 10, 140, ILI9341_WHITE);
     drawFillRectangle(rectX, rectY, rectWidth, rectHeight, ILI9341_WHITE); //draw button
     drawTextCentered(brightnessLevel.c_str(), rectX + (rectWidth / 2), rectY + (rectHeight / 2), ILI9341_BLACK);//add text
