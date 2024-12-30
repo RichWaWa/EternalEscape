@@ -41,5 +41,6 @@ const char mazeTemplate[31][41] = {
 //maze generator functions
 void generateMaze();        //Generate the maze
 void drawElement(int rowA, int colA, char cellType);   //draw the cell element
+void drawMazeTemplate();
 
 #endif // MAZEGEN_H

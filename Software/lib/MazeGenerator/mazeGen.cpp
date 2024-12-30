@@ -10,6 +10,122 @@ https://github.com/jamis/csmazes
 */
 char maze[31][41]; //the maze which will be built
 
+// Constants
+const int mazeWidth = 20;
+const int mazeHeight = 15;
+const int cellSize = 14;
+const int wallThickness = 2;
+const uint16_t DARKGREY = 0x7BEF;
+const uint16_t BLACK = 0x0000;
+const uint16_t GREY = 0xC618;
+const uint16_t WHITE = 0xFFFF;
+const uint16_t BORDER_COLOR = WHITE;
+
+// Directions for movement (left, right, up, down)
+const int dx[] = {0, 0, -1, 1};
+const int dy[] = {-1, 1, 0, 0};
+
+// Function to draw the entire maze
+void drawMazeTemplate() {
+    // Fill the screen with DARKGREY
+    drawFillRectangle(0, 0, 320, 240, DARKGREY);
+
+    // Draw the border
+    drawBorderedRectangle(0, 0, 320, 240, BORDER_COLOR, DARKGREY, 1);
+
+    // Initialize maze with walls
+    std::vector<std::vector<char>> maze(mazeHeight * 2 + 1, std::vector<char>(mazeWidth * 2 + 1, '#'));
+
+    // Randomized Prim’s algorithm
+    struct Cell {
+        int x, y;
+    };
+    std::vector<Cell> frontier;
+
+    // Start position (randomized)
+    int startX = rand() % mazeWidth * 2 + 1;
+    int startY = rand() % mazeHeight * 2 + 1;
+    maze[startY][startX] = '.'; // Mark start as path
+
+    // Add initial frontiers
+    for (int i = 0; i < 4; ++i) {
+        int nx = startX + dx[i] * 2;
+        int ny = startY + dy[i] * 2;
+        if (nx > 0 && ny > 0 && nx < mazeWidth * 2 && ny < mazeHeight * 2) {
+            frontier.push_back({nx, ny});
+        }
+    }
+
+    // Draw the start cell
+    int startXPixel = 1 + (startX / 2) * (cellSize + wallThickness);
+    int startYPixel = 1 + (startY / 2) * (cellSize + wallThickness);
+    drawFillRectangle(startXPixel, startYPixel, cellSize, cellSize, BLACK);
+
+    // Prim's Algorithm Loop
+    while (!frontier.empty()) {
+        // Pick a random frontier cell
+        int index = rand() % frontier.size();
+        Cell current = frontier[index];
+        frontier.erase(frontier.begin() + index);
+
+        // Check if it can become a path
+        int adjacentPaths = 0;
+        int pathX = 0, pathY = 0;
+        for (int i = 0; i < 4; ++i) {
+            int nx = current.x + dx[i] * 2;
+            int ny = current.y + dy[i] * 2;
+            if (nx > 0 && ny > 0 && nx < mazeWidth * 2 && ny < mazeHeight * 2 && maze[ny][nx] == '.') {
+                adjacentPaths++;
+                pathX = current.x + dx[i];
+                pathY = current.y + dy[i];
+            }
+        }
+
+        if (adjacentPaths == 1) {
+            maze[current.y][current.x] = '.';
+            maze[pathY][pathX] = '.';
+
+            // Draw path cell
+            int pathXPixel = 1 + (pathX / 2) * (cellSize + wallThickness);
+            int pathYPixel = 1 + (pathY / 2) * (cellSize + wallThickness);
+            drawFillRectangle(pathXPixel, pathYPixel, cellSize, cellSize, BLACK);
+
+            // Add new frontiers
+            for (int i = 0; i < 4; ++i) {
+                int nx = current.x + dx[i] * 2;
+                int ny = current.y + dy[i] * 2;
+                if (nx > 0 && ny > 0 && nx < mazeWidth * 2 && ny < mazeHeight * 2 && maze[ny][nx] == '#') {
+                    frontier.push_back({nx, ny});
+                    // Draw frontier cell
+                    int frontierXPixel = 1 + (nx / 2) * (cellSize + wallThickness);
+                    int frontierYPixel = 1 + (ny / 2) * (cellSize + wallThickness);
+                    drawFillRectangle(frontierXPixel, frontierYPixel, cellSize, cellSize, GREY);
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //Function 
 void generateMaze() {
     const int mazeHeight = 31;
