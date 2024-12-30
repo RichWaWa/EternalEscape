@@ -178,7 +178,7 @@ void toggleBrightness() {
 int loadBrightnessFromSettings(){
     brightnessLevel = loadBrightness(); //load from settings
 
-    if (brightnessLevel = "LO") {
+    if (brightnessLevel == "LO") {
         brightnessPWM = 85;     // 1/3 of 255
     } else if (brightnessLevel == "MD") {
         brightnessPWM = 170;    // 2/3 of 255
