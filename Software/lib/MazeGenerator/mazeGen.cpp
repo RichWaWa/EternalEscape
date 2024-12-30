@@ -197,7 +197,7 @@ void drawElement(int rowA, int colA, char cellType) {
             break;
 
         case 'E': // End
-            drawFillRectangle(x, y, cellSize, cellSize, DARKGREY); // Grey
+            drawFinishSquare(x, y, cellSize); // Draws Checkered Shape
             break;
 
         case 'S': // Start

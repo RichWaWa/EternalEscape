@@ -25,6 +25,7 @@ void initScreen() {
     tft.fillScreen(ILI9341_BLACK);  
     pinMode(TFT_LITE, OUTPUT); //set the PWM output for the backlight
     //need to load the brightness from the settings
+    brightnessPWM = loadBrightnessFromSettings();
     analogWrite(TFT_LITE, brightnessPWM);   //set brightness level
     loadingScreen();    //show the loading screen
 
@@ -169,18 +170,27 @@ void toggleBrightness() {
         brightnessLevel = "HI";
         brightnessPWM = 255;    // 3/3 of 255
     }
-    //saveBrightness(brightnessLevel);    //save to settings
+    saveBrightness(brightnessLevel);    //save to settings
     analogWrite(TFT_LITE, brightnessPWM);   //set brightness level
 }
 
 //load and apply brightness from settings
-void loadBrightnessFromSettings(){
+int loadBrightnessFromSettings(){
     brightnessLevel = loadBrightness(); //load from settings
-    
 
+    if (brightnessLevel = "LO") {
+        brightnessPWM = 85;     // 1/3 of 255
+    } else if (brightnessLevel == "MD") {
+        brightnessPWM = 170;    // 2/3 of 255
+    } else {
+        brightnessLevel == "HI";
+        brightnessPWM = 255;    // 3/3 of 255
+    }
+    return brightnessPWM;
 }
-
+////////////////////
 // Utility functions
+////////////////////
 void drawText(const char* text, int16_t x, int16_t y, uint16_t color) {
     tft.setCursor(x, y);
     tft.setTextColor(color);
@@ -208,7 +218,7 @@ void drawBorderedRectangle(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t 
     }
 }
 
-
+//draws centered text
 void drawTextCentered(const char* text, int16_t centerX, int16_t centerY, uint16_t color) {
     int16_t x1, y1;
     uint16_t w, h;
@@ -218,4 +228,24 @@ void drawTextCentered(const char* text, int16_t centerX, int16_t centerY, uint16
     tft.setCursor(centerX - (w / 2), centerY - (h / 2));
     tft.setTextColor(color);
     tft.print(text);
+}
+
+//draw finish square
+void drawFinishSquare(int16_t x, int16_t y, int16_t cellSize){
+    int16_t halfCell = cellSize / 2; // Calculate half of the cell size for rows and columns
+
+    // Draw the black background
+    drawFillRectangle(x, y, cellSize, cellSize, ILI9341_BLACK); // Black background
+
+    // Draw the white checkered pattern
+    for (int16_t row = 0; row < cellSize; row += 4) { // Step by 4 pixels (2 for each white square)
+        for (int16_t col = 0; col < cellSize; col += 4) {
+            // Top-left square of the 4x4 grid
+            drawFillRectangle(x + col, y + row, 2, 2, ILI9341_WHITE); // White square
+            // Bottom-right square of the 4x4 grid
+            if (col + 2 < cellSize && row + 2 < cellSize) {
+                drawFillRectangle(x + col + 2, y + row + 2, 2, 2, ILI9341_WHITE); // White square
+            }
+        }
+    }
 }
