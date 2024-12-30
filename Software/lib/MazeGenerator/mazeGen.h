@@ -1,8 +1,10 @@
 #ifndef MAZEGEN_H
 #define MAZEGEN_H
+#include <vector>
+using namespace std;
 
-// Declare the maze template
-const char mazeTemplate[31][41] = {
+// Declare the maze template //This one has dimentions [31][41]
+vector<vector<char>>  mazeTemplate = {
     // Top border
     {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'},
     {'*', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '*'},
@@ -41,6 +43,6 @@ const char mazeTemplate[31][41] = {
 //maze generator functions
 void generateMaze();        //Generate the maze
 void drawElement(int rowA, int colA, char cellType);   //draw the cell element
-void drawMazeTemplate();
+//void drawMazeTemplate();
 
 #endif // MAZEGEN_H

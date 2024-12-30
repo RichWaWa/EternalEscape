@@ -3,22 +3,19 @@
 #include <vector>
 #include <cstdlib>
 #include <ctime>
+using namespace std;
 /*
 Implementation of Prims algorithm guided by the following sources
 https://weblog.jamisbuck.org/2011/1/10/maze-generation-prim-s-algorithm
 https://github.com/jamis/csmazes
 */
-char maze[31][41]; //the maze which will be built
+//char maze[31][41]; //the maze which will be built
+vector<vector<char>>  maze;
 //Function 
 void generateMaze() {
     const int mazeHeight = 31;
     const int mazeWidth = 41;
-    // Copy the maze template
-    for (int row = 0; row < mazeHeight; ++row) {
-        for (int col = 0; col < mazeWidth; ++col) {
-            maze[row][col] = mazeTemplate[row][col];
-        }
-    }
+    maze = mazeTemplate;
 
     // Seed random number generator
     srand(static_cast<unsigned>(time(0)));
