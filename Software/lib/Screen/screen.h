@@ -48,6 +48,8 @@ void loadingScreen();
 // Helper functions
 void drawText(const char* text, int16_t x, int16_t y, uint16_t color);
 void drawFillRectangle(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+void drawFillScreen(uint16_t color);
+void drawBorderedRectangle(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t borderColor, uint16_t fillColor, uint16_t t);
 void drawTextCentered(const char* text, int16_t centerX, int16_t centerY, uint16_t color);
 void toggleBrightness();
 String getBrightnessLevel();

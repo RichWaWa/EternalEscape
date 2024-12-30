@@ -33,6 +33,8 @@ static bool debounceInProgress = false;   // Tracks if debounce is active
 void updateStateMachine();  //update state machine function
 //generic function declerations
 void waitForSerial(unsigned long timeout = 10000);  //default value of 10000
+void settings();  //Settings
+void maze();  //Maze
 
 //Mac address
 String macAddr;
@@ -63,58 +65,15 @@ void setup() {
 //Main Program Loop
 ////////////////////////////////////////////////////
 void loop() {
-  static unsigned long strobeTimer = 0;
   //get the touchpoints from the display
   getTouchPoints(x,y,z); 
   updateStateMachine();
-  ////////////////////////////////////////////////////
-  //Update display Into Maze or Settings mode
-  ////////////////////////////////////////////////////
+  
   //Settings
-  if (currentState == SETTINGS) {
-    if(!settingsOpenLast){
-      //draw everything the first go around
-      drawSettingsScreen(macAddr, isWiFiConnected());
-      settingsOpenLast = true;  //update to true to indicate its been run initially
-    }else{
-      //otherwise, we know everything else is drawn so we can just update it.
-      updateSettingsScreen(x, y, z, isWiFiConnected());
-    }
-    
-  }else{
-    settingsOpenLast = false; //settings tab closed
-  }
+  settings();
+
   //Maze
-  if (currentState == MAZESCREEN) {
-    if(!mazeScreenOpenLast){
-      //draw the maze initially
-
-
-      //run last
-      mazeScreenOpenLast = true;  //update to true to indicate its been run initially
-    }else{
-      //update the maze as the player moves here.
-
-
-      if (millis() - strobeTimer >= 1000) {
-      strobeTimer = millis();
-
-      static int colorIndex = 0;
-      uint16_t colors[] = {ILI9341_RED, ILI9341_GREEN, ILI9341_BLUE};
-      drawStrobeScreen(colors[colorIndex]);
-
-      switch (colorIndex) {
-        case 0: pixels.setPixelColor(0, pixels.Color(255, 0, 0)); break;
-        case 1: pixels.setPixelColor(0, pixels.Color(0, 255, 0)); break;
-        case 2: pixels.setPixelColor(0, pixels.Color(0, 0, 255)); break;
-      }
-      pixels.show();
-      colorIndex = (colorIndex + 1) % 3;
-      }
-    }//end open last else
-  }else{
-    mazeScreenOpenLast = false; //maze screen closed
-  }//END Display Screen updates
+  maze();
 }//End Main loop
 
 ////////////////////////////////////////////////////
@@ -174,3 +133,76 @@ void waitForSerial(unsigned long timeout) { //Waits for a serial connection befo
     }
     Serial.println("Serial connection established.");
 }//END waitForSerial
+
+//Draw settings screen
+void settings(){
+  if (currentState == SETTINGS) {
+    if(!settingsOpenLast){
+      //draw everything the first go around
+      drawSettingsScreen(macAddr, isWiFiConnected());
+      settingsOpenLast = true;  //update to true to indicate its been run initially
+    }else{
+      //otherwise, we know everything else is drawn so we can just update it.
+      updateSettingsScreen(x, y, z, isWiFiConnected());
+    }
+    
+  }else{
+    settingsOpenLast = false; //settings tab closed
+  }
+}//end settings
+
+//Draw the maze
+void maze(){
+  if (currentState == MAZESCREEN) {
+    if(!mazeScreenOpenLast){
+      //draw the maze initially
+      drawFillScreen(0xFFFF); //Fill screen with white
+      generateMaze();
+
+      //run last
+      mazeScreenOpenLast = true;  //update to true to indicate its been run initially
+    }else{
+      //update the maze as the player moves here.
+
+
+    }//end open last else
+  }else{
+    mazeScreenOpenLast = false; //maze screen closed
+  }//END Display Screen updates
+}
+
+//Draw the colorStrobe
+void colorStrobe(){
+  static unsigned long strobeTimer = 0;
+
+  if (currentState == MAZESCREEN) {
+    if(!mazeScreenOpenLast){
+      //draw the maze initially
+
+
+      //run last
+      mazeScreenOpenLast = true;  //update to true to indicate its been run initially
+    }else{
+      //update the maze as the player moves here.
+
+
+      if (millis() - strobeTimer >= 1000) {
+      strobeTimer = millis();
+
+      static int colorIndex = 0;
+      uint16_t colors[] = {ILI9341_RED, ILI9341_GREEN, ILI9341_BLUE};
+      drawStrobeScreen(colors[colorIndex]);
+
+      switch (colorIndex) {
+        case 0: pixels.setPixelColor(0, pixels.Color(255, 0, 0)); break;
+        case 1: pixels.setPixelColor(0, pixels.Color(0, 255, 0)); break;
+        case 2: pixels.setPixelColor(0, pixels.Color(0, 0, 255)); break;
+      }
+      pixels.show();
+      colorIndex = (colorIndex + 1) % 3;
+      }
+    }//end open last else
+  }else{
+    mazeScreenOpenLast = false; //maze screen closed
+  }//END Display Screen updates
+}

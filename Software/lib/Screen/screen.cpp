@@ -62,10 +62,16 @@ void drawSettingsScreen(const String& macAddress, bool wifiStatus) {
 void updateSettingsScreen(int16_t x, int16_t y, int16_t z ,bool wifiStatus) {
     // Update wifi status only if it has changed
     if (wifiStatus != wifiStatusLast) {
+        int16_t x1, y1;
+        uint16_t w, h;
         if (wifiStatus) {
             drawText("Wifi Connected", 10, 40, ILI9341_GREEN);
+            tft.getTextBounds("Wifi Connected", 0, 0, &x1, &y1, &w, &h);
+            tft.fillRect(x1, y1, w, h, ILI9341_BLACK);
         } else {
             drawText("Wifi Disconnected", 10, 40, ILI9341_RED);
+            tft.getTextBounds("Wifi Disconnected", 0, 0, &x1, &y1, &w, &h);
+            tft.fillRect(x1, y1, w, h, ILI9341_BLACK);
         }
         wifiStatusLast = wifiStatus;
     }
@@ -116,7 +122,7 @@ void checkBrightnessButtonTouch(int16_t x, int16_t y, int16_t z) {
             unsigned long currentTime = millis();
             if (currentTime - lastTouchTime > debounceDelay) {
                 // Toggle brightness level
-                toggleBrightness(); // Call your brightness toggle function here
+                toggleBrightness(); // toggle brightness
 
                 // Update the brightness level on the screen
                 drawFillRectangle(rectX, rectY, rectWidth, rectHeight, ILI9341_WHITE); // Redraw rectangle
@@ -167,6 +173,13 @@ void toggleBrightness() {
     analogWrite(TFT_LITE, brightnessPWM);   //set brightness level
 }
 
+//load and apply brightness from settings
+void loadBrightnessFromSettings(){
+    brightnessLevel = loadBrightness(); //load from settings
+    
+
+}
+
 // Utility functions
 void drawText(const char* text, int16_t x, int16_t y, uint16_t color) {
     tft.setCursor(x, y);
@@ -178,6 +191,23 @@ void drawText(const char* text, int16_t x, int16_t y, uint16_t color) {
 void drawFillRectangle(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) {
     tft.fillRect(x, y, w, h, color);
 }
+
+void drawFillScreen(uint16_t color){
+    tft.fillScreen(color);
+}
+
+//draw a border rectangle.
+void drawBorderedRectangle(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t borderColor, uint16_t fillColor, uint16_t t) 
+{
+    // Draw the outer rectangle (the border)
+    tft.fillRect(x, y, w, h, borderColor);
+
+    // Draw the inner rectangle (the fill), offset by thickness t
+    if (t < w / 2 && t < h / 2) { // Ensure thickness is valid
+        tft.fillRect(x + t, y + t, w - 2 * t, h - 2 * t, fillColor);
+    }
+}
+
 
 void drawTextCentered(const char* text, int16_t centerX, int16_t centerY, uint16_t color) {
     int16_t x1, y1;

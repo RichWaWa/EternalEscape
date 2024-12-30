@@ -1,4 +1,5 @@
 #include "mazeGen.h"
+#include "screen.h"
 #include <vector>
 #include <cstdlib>
 #include <ctime>
@@ -7,9 +8,10 @@ Implementation of Prims algorithm guided by the following sources
 https://weblog.jamisbuck.org/2011/1/10/maze-generation-prim-s-algorithm
 https://github.com/jamis/csmazes
 */
+char maze[31][41]; //the maze which will be built
 
-
-void generateMaze(char maze[31][41]) {
+//Function 
+void generateMaze() {
     const int mazeHeight = 31;
     const int mazeWidth = 41;
     // Copy the maze template
@@ -34,9 +36,19 @@ void generateMaze(char maze[31][41]) {
     std::vector<Cell> walls;
 
     // Helper function to check if a position is valid
+    // Lambda function to check if a cell is a valid target for the maze generation algorithm
     auto isValid = [&](int row, int col) {
-        return row > 0 && row < mazeHeight && col > 0 && col < mazeWidth &&
-               maze[row][col] == '#' && maze[row][col] != 'C';
+        // Check if the cell is within the maze boundaries
+        bool withinBounds = (row > 0 && row < (mazeHeight - 1) && col > 0 && col < (mazeWidth - 1));
+
+        // Check if the cell is a wall ('#')
+        bool isWall = (maze[row][col] == '#');
+
+        // Ensure the cell is not a corner ('C')
+        bool notCorner = (maze[row][col] != 'C');
+
+        // Return true only if all conditions are met
+        return withinBounds && isWall && notCorner;
     };
 
     // Find the starting position (a '.' on the maze template)
@@ -51,16 +63,16 @@ void generateMaze(char maze[31][41]) {
         // Check if the selected cell is a valid starting point
         if (maze[row][col] == '.') {
             start = {row, col};
+            // Mark the starting point with 'S'
+            maze[start.row][start.col] = 'S';
+            drawElement(start.row, start.col, 'S');
             foundStart = true;
         }
     }
-    // Mark the starting point with 'S'
-    maze[start.row][start.col] = 'S';
-
+    
     // Place an exit ('E') on a border wall
     //place exit(Gotta make sure the algo can work around this too)
     bool exitPlaced = false;
-
     while (!exitPlaced) {
         // Randomly select one of the edge regions
         int edge = rand() % 4; // 0: first row, 1: last row, 2: first column, 3: last column
@@ -91,6 +103,7 @@ void generateMaze(char maze[31][41]) {
         // Check if the selected position is a valid path
         if (maze[row][col] == '.') {
             maze[row][col] = 'E'; // Place the exit
+            drawElement(row, col, 'E');
             exitPlaced = true;
         }
     }
@@ -122,9 +135,11 @@ void generateMaze(char maze[31][41]) {
                 
                 // Carve path through the wall and mark it as path
                 maze[wall.row][wall.col] = '.';
+                drawElement(wall.row, wall.col, '.');
                 int newPathRow = (wall.row + oppositeRow) / 2;
                 int newPathCol = (wall.col + oppositeCol) / 2;
                 maze[newPathRow][newPathCol] = '.';
+                drawElement(newPathRow, newPathCol, '.');
 
                 // Add new walls to the list
                 for (const auto& newDir : directions) {
@@ -137,5 +152,60 @@ void generateMaze(char maze[31][41]) {
                 break;
             }
         }
+    }
+}
+
+//Call this to draw the maze elements
+void drawElement(int rowA, int colA, char cellType) {
+    // Maze cell dimensions
+    const int cellSize = 14;
+    const int wallThickness = 2;
+    const int offset = 1; // Account for the 1-pixel border around the maze area
+
+    // Colors in 16-bit RGB565 format
+    const uint16_t BLACK = 0x0000; 
+    const uint16_t WHITE = 0xFFFF; 
+    const uint16_t GREEN = 0x07E0; 
+    const uint16_t RED = 0xF800;   
+    const uint16_t DARKGREY = 0x7BEF;
+
+    // Calculate the top-left pixel coordinates of the cell
+    int x = offset + colA * cellSize;
+    int y = offset + rowA * cellSize;
+
+    // Determine what to draw based on cellType
+    switch (cellType) {
+        case '.': // Path cell (black 14x14)
+            drawFillRectangle(x, y, cellSize, cellSize, BLACK);
+            break;
+
+        case '#': // Wall cell
+            if (colA % 2 == 1 && rowA % 2 == 0) {
+                // Odd column, even row: Horizontal wall
+                drawFillRectangle(x, y + (cellSize / 2 - 1), cellSize, wallThickness, WHITE);
+            } else if (colA % 2 == 0 && rowA % 2 == 1) {
+                // Even column, odd row: Vertical wall
+                drawFillRectangle(x + (cellSize / 2 - 1), y, wallThickness, cellSize, WHITE);
+            } else {
+                // Default fallback for unexpected wall cases
+                drawFillRectangle(x, y, cellSize, cellSize, GREEN);
+            }
+            break;
+
+        case 'C': // Corner cell (white 2x2)
+            drawFillRectangle(x + (cellSize / 2 - 1), y + (cellSize / 2 - 1), wallThickness, wallThickness, WHITE);
+            break;
+
+        case 'E': // End
+            drawFillRectangle(x, y, cellSize, cellSize, DARKGREY); // Grey
+            break;
+
+        case 'S': // Start
+            drawFillRectangle(x, y, cellSize, cellSize, RED); // Red
+            break;
+
+        default: // Default case (green 14x14)
+            drawFillRectangle(x, y, cellSize, cellSize, GREEN);
+            break;
     }
 }
