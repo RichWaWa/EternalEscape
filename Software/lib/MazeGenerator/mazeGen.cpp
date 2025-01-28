@@ -13,71 +13,65 @@ https://github.com/jamis/csmazes
 vector<vector<char>>  maze;
 //Function 
 void generateMaze() {
-    const int mazeHeight = 31;
-    const int mazeWidth = 41;
-    maze = mazeTemplate;
+    //First, copy the template maze "mazeTemplate"
+    //next, choose a random "#" too be the start, and another different "# to be the finish"
+    //Lastly, print the template maze to the display using the drawElement function.
 
-    // Seed random number generator
-    srand(static_cast<unsigned>(time(0)));
+    // Step 1: Copy the template
+    vector<vector<char>> maze = copyMazeTemplate();
 
-    // Structure for representing a position in the maze
-    struct Cell {
-        int row, col;
-    };
+    // Step 2: Place start ('S') and end ('E')
+    placeStartAndEnd(maze);
 
-    // Directions for neighbors: {row_offset, col_offset}
-    const Cell directions[] = {{-2, 0}, {2, 0}, {0, -2}, {0, 2}};
+    // Step 3: Render the maze to the display
+    renderMaze(maze);
 
-    // Find the starting position (a '.' on the maze template)
-    // Find a random starting position (a '.' on the maze template)
-    Cell start;
-    bool foundStart = false;
-    while (!foundStart) {
-        // Randomly choose a row and column within the bounds
-        int row = 1 + rand() % (mazeHeight - 2); // Rows between 1 and 30
-        int col = 1 + rand() % (mazeWidth - 2); // Columns between 1 and 40
+}
 
-        // Check if the selected cell is a valid starting point
+// Function to copy the template
+vector<vector<char>> copyMazeTemplate() {
+    return mazeTemplate;
+}
+
+// Function to choose a random "#" for start ('S') and end ('E')
+void placeStartAndEnd(vector<vector<char>>& maze) {
+    int rows = maze.size();
+    int cols = maze[0].size();
+
+    srand(time(0)); // Seed for random number generation
+
+    // Randomly select start
+    bool startPlaced = false;
+    while (!startPlaced) {
+        int row = rand() % rows;
+        int col = rand() % cols;
         if (maze[row][col] == '.') {
-            start = {row, col};
-            // Mark the starting point with 'S'
-            maze[start.row][start.col] = 'S';
-            drawElement(start.row, start.col, 'S');
-            foundStart = true;
+            maze[row][col] = 'S';
+            startPlaced = true;
         }
     }
-    
-    // Place an exit ('E') on a border wall
-    //place exit(Gotta make sure the algo can work around this too)
-    bool exitPlaced = false;
-    while (!exitPlaced) {
-        // Randomly select one of the edge regions
-        int edge = rand() % 4; // 0: first row, 1: last row, 2: first column, 3: last column
-        int row, col;
 
-        switch (edge) {
-            case 0: // First row (row 1, columns 1-40)
-                row = 1;
-                col = 1 + rand() % (mazeWidth - 2); // Columns 1 to 40
-                break;
-
-            case 1: // Last row (row 30, columns 1-40)
-                row = 30;
-                col = 1 + rand() % (mazeWidth - 2); // Columns 1 to 40
-                break;
-
-            case 2: // First column (rows 1-30, column 1)
-                row = 1 + rand() % (mazeHeight - 2); // Rows 1 to 29
-                col = 1;
-                break;
-
-            case 3: // Last column (rows 1-30, column 40)
-                row = 1 + rand() % (mazeHeight - 2); // Rows 1 to 30
-                col = 40;
-                break;
+    // Randomly select end
+    bool endPlaced = false;
+    while (!endPlaced) {
+        int row = rand() % rows;
+        int col = rand() % cols;
+        if (maze[row][col] == '.' && maze[row][col] != 'S') {
+            maze[row][col] = 'E';
+            endPlaced = true;
         }
     }
 }
+
+// Function to render the maze to the display
+void renderMaze(const vector<vector<char>>& maze) {
+    for (int row = 0; row < maze.size(); ++row) {
+        for (int col = 0; col < maze[row].size(); ++col) {
+            drawElement(row, col, maze[row][col]);
+        }
+    }
+}
+
 
 //Call this to draw the maze elements
 void drawElement(int rowA, int colA, char cellType) {

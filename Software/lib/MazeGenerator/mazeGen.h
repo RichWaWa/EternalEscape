@@ -4,7 +4,7 @@
 using namespace std;
 
 // Declare the maze template //This one has dimentions [31][41]
-vector<vector<char>>  mazeTemplate = {
+const vector<vector<char>>  mazeTemplate = {
     // Top border
     {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'},
     {'*', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '#', '.', '*'},
@@ -42,6 +42,9 @@ vector<vector<char>>  mazeTemplate = {
 
 //maze generator functions
 void generateMaze();        //Generate the maze
+vector<vector<char>> copyMazeTemplate();
+void placeStartAndEnd(vector<vector<char>>& maze);
+void renderMaze(const vector<vector<char>>& maze);
 void drawElement(int rowA, int colA, char cellType);   //draw the cell element
 //void drawMazeTemplate();
 

@@ -156,8 +156,8 @@ void maze(){
   if (currentState == MAZESCREEN) {
     if(!mazeScreenOpenLast){
       //draw the maze initially
-      //drawFillScreen(0xFFFF); //Fill screen with white
-      //generateMaze();
+      drawFillScreen(0xFFFF); //Fill screen with white
+      generateMaze();
       //drawMazeTemplate();
 
       //run last
