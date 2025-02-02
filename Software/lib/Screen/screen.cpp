@@ -255,7 +255,7 @@ void drawElement(int rowA, int colA, char cellType) {
     // Maze cell dimensions
     const int cellSize = 14;
     const int wallThickness = 2;
-    const int offset = 1; // Account for the 1-pixel border around the maze area
+    const int offset = 1; // Account for the 1-pixel border around the maze area (temp changed to 0)
 
     // Colors in 16-bit RGB565 format
     const uint16_t BLACK = 0x0000; 
@@ -267,6 +267,7 @@ void drawElement(int rowA, int colA, char cellType) {
     const uint16_t DARKGREY = 0x7BEF;
 
     // Calculate the top-left pixel coordinates of the cell
+    //needs to accomodate that the cells are different sizes!
     int x = offset + colA * cellSize;
     int y = offset + rowA * cellSize;
 
@@ -301,7 +302,7 @@ void drawElement(int rowA, int colA, char cellType) {
             drawFillRectangle(x, y, cellSize, cellSize, RED); // Red
             break;
         case '*': //Border
-            //dont do anything, I account for this elsewhere
+            //Do nothing. Nothing ever happens.
             break;
         default: // Default case (green 14x14)
             drawFillRectangle(x, y, cellSize/2, cellSize/2, GREEN);
