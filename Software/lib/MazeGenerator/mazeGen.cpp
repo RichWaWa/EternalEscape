@@ -65,6 +65,7 @@ void placeStartAndEnd(vector<vector<char>>& maze) {
 
 // Function to render the maze to the display
 void renderMaze(const vector<vector<char>>& maze) {
+    drawFillScreen(0xFBE0); //fill orange
     for (int row = 0; row < maze.size(); ++row) {
         for (int col = 0; col < maze[row].size(); ++col) {
             drawElement(row, col, maze[row][col]);

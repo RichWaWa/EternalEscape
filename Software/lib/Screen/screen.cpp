@@ -262,6 +262,7 @@ void drawElement(int rowA, int colA, char cellType) {
     const uint16_t WHITE = 0xFFFF; 
     const uint16_t GREEN = 0x07E0; 
     const uint16_t RED = 0xF800; 
+    const uint16_t ORANGE = 0xFBE0;
     const uint16_t GREY = 0xC618; 
     const uint16_t DARKGREY = 0x7BEF;
 
@@ -297,11 +298,13 @@ void drawElement(int rowA, int colA, char cellType) {
             break;
 
         case 'S': // Start
-            drawFillRectangle(x, y, cellSize, cellSize, GREY); // Red
+            drawFillRectangle(x, y, cellSize, cellSize, RED); // Red
             break;
-
+        case '*': //Border
+            //dont do anything, I account for this elsewhere
+            break;
         default: // Default case (green 14x14)
-            drawFillRectangle(x, y, cellSize, cellSize, GREEN);
+            drawFillRectangle(x, y, cellSize/2, cellSize/2, GREEN);
             break;
     }
 }
