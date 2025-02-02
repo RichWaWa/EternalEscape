@@ -43,6 +43,7 @@ void drawStrobeScreen(uint16_t color);
 void drawSettingsScreen(const String& macAddress, bool wifiStatus);
 void updateSettingsScreen(int16_t x, int16_t y, int16_t z, bool wifiStatus);
 void checkBrightnessButtonTouch(int16_t x, int16_t y, int16_t z);
+void drawElement(int rowA, int colA, char cellType);   //draw the cell element
 void loadingScreen();
 
 // Helper functions

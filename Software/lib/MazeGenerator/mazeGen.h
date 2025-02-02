@@ -45,7 +45,6 @@ void generateMaze();        //Generate the maze
 vector<vector<char>> copyMazeTemplate();
 void placeStartAndEnd(vector<vector<char>>& maze);
 void renderMaze(const vector<vector<char>>& maze);
-void drawElement(int rowA, int colA, char cellType);   //draw the cell element
 //void drawMazeTemplate();
 
 #endif // MAZEGEN_H
