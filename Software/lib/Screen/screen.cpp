@@ -257,19 +257,10 @@ void drawElement(int rowA, int colA, char cellType) {
     const int wallThickness = 2;
     const int offset = 1; // Account for the 1-pixel border around the maze area (temp changed to 0)
 
-    // Colors in 16-bit RGB565 format
-    const uint16_t BLACK = 0x0000; 
-    const uint16_t WHITE = 0xFFFF; 
-    const uint16_t GREEN = 0x07E0; 
-    const uint16_t RED = 0xF800; 
-    const uint16_t ORANGE = 0xFBE0;
-    const uint16_t GREY = 0xC618; 
-    const uint16_t DARKGREY = 0x7BEF;
-
     // Calculate the top-left pixel coordinates of the cell
     //needs to accomodate that the cells are different sizes!
-    int x = offset + colA * cellSize;
-    int y = offset + rowA * cellSize;
+    int x = offset + (colA - 1) * 8; //this has to be 8 for some reason. Some relationship between the cell size and the wall thickness
+    int y = offset + (rowA - 1) * 8;
 
     // Determine what to draw based on cellType
     switch (cellType) {
@@ -280,18 +271,18 @@ void drawElement(int rowA, int colA, char cellType) {
         case '#': // Wall cell
             if (colA % 2 == 1 && rowA % 2 == 0) {
                 // Odd column, even row: Horizontal wall
-                drawFillRectangle(x, y + (cellSize / 2 - 1), cellSize, wallThickness, WHITE);
+                drawFillRectangle(x, y + (cellSize / 2 - 1), cellSize, wallThickness, DARKGREY);
             } else if (colA % 2 == 0 && rowA % 2 == 1) {
                 // Even column, odd row: Vertical wall
-                drawFillRectangle(x + (cellSize / 2 - 1), y, wallThickness, cellSize, WHITE);
+                drawFillRectangle(x + (cellSize / 2 - 1), y, wallThickness, cellSize, DARKGREY);
             } else {
                 // Default fallback for unexpected wall cases
-                drawFillRectangle(x, y, cellSize, cellSize, GREEN);
+                drawFillRectangle(x, y, 4, 4, GREEN);
             }
             break;
 
         case 'C': // Corner cell (white 2x2)
-            drawFillRectangle(x + (cellSize / 2 - 1), y + (cellSize / 2 - 1), wallThickness, wallThickness, WHITE);
+            drawFillRectangle(x + (cellSize / 2 - 1), y + (cellSize / 2 - 1), wallThickness, wallThickness, DARKGREY);
             break;
 
         case 'E': // End
@@ -304,8 +295,8 @@ void drawElement(int rowA, int colA, char cellType) {
         case '*': //Border
             //Do nothing. Nothing ever happens.
             break;
-        default: // Default case (green 14x14)
-            drawFillRectangle(x, y, cellSize/2, cellSize/2, GREEN);
+        default: // Default case (green 4x4)
+            drawFillRectangle(x, y, 4, 4, GREEN);
             break;
     }
 }

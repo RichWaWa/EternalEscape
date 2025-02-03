@@ -65,9 +65,10 @@ void placeStartAndEnd(vector<vector<char>>& maze) {
 
 // Function to render the maze to the display
 void renderMaze(const vector<vector<char>>& maze) {
-    drawFillScreen(0xFBE0); //fill orange
-    for (int row = 0; row < maze.size(); ++row) {
-        for (int col = 0; col < maze[row].size(); ++col) {
+    drawFillScreen(DARKGREY); //fill orange
+    //start at row one to exclude the border
+    for (int row = 1; row < maze.size() - 1; ++row) {
+        for (int col = 1; col < maze[row].size() - 1; ++col) {
             drawElement(row, col, maze[row][col]);
         }
     }
