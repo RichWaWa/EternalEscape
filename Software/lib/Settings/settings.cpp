@@ -32,16 +32,17 @@ void saveBrightness(String brightness) {
 // Function to load the brightness level
 String loadBrightness() {
     preferences.begin("settings", true); // Open Preferences in read mode
+    String brightness = "HI"; // Default value
 
     if (preferences.isKey("brightness")) {
-        //Serial.println("Found the brightness saved!");    //debug
-        preferences.end();
-        return preferences.getString("brightness"); // Retrieve the brightness value
+        //Serial.println("Found the brightness setting!");
+        brightness = preferences.getString("brightness"); // Retrieve stored value
     } else {
-        //Serial.println("Returning default brightness");
-        preferences.end();
-        return "HI"; // Default brightness level if not set
+        //Serial.println("Brightness not found, using default value.");
     }
+
+    preferences.end(); // Close Preferences
+    return brightness;
 }
 
 // Function to clear all preferences

@@ -177,14 +177,17 @@ void toggleBrightness() {
 //load and apply brightness from settings
 int loadBrightnessFromSettings(){
     brightnessLevel = loadBrightness(); //load from settings
+    //Serial.print("Here is the brightness I loaded ");
+    //Serial.println(brightnessLevel);
 
     if (brightnessLevel.equals("LO")) {
         brightnessPWM = 85;     // 1/3 of 255
     } else if (brightnessLevel.equals("MD")) {
         brightnessPWM = 170;    // 2/3 of 255
     } else {
-        brightnessLevel == "HI";
+        brightnessLevel = "HI";
         brightnessPWM = 255;    // 3/3 of 255
+        //Serial.println("Load brightness from settings defaulted");
     }
     return brightnessPWM;
 }
