@@ -10,27 +10,43 @@ void initializePreferences() {
 
     // Check if this is the first run by looking for a "firstRun" key
     if (!preferences.isKey("firstRun")) {
+        //Serial.println("I think its my first run");    //debug
         // Set default values for all settings
         preferences.putString("brightness", "HI"); // Default brightness
         preferences.putBool("firstRun", false); // Mark first run as complete
     }
+    preferences.end();
 }
 
 // Function to save the brightness level
 void saveBrightness(String brightness) {
+    preferences.begin("settings", false);// Namespace "settings", RW mode
+
     preferences.putString("brightness", brightness); // Store the brightness value
+    //Serial.print("saved brightness");    //debug
+    //Serial.println(brightness);
+
+    preferences.end();
 }
 
 // Function to load the brightness level
 String loadBrightness() {
+    preferences.begin("settings", true); // Open Preferences in read mode
+
     if (preferences.isKey("brightness")) {
+        //Serial.println("Found the brightness saved!");    //debug
+        preferences.end();
         return preferences.getString("brightness"); // Retrieve the brightness value
     } else {
+        //Serial.println("Returning default brightness");
+        preferences.end();
         return "HI"; // Default brightness level if not set
     }
 }
 
 // Function to clear all preferences
 void clearPreferences() {
+    preferences.begin("settings", false); // Open Preferences
     preferences.clear(); // Erase all keys in the current namespace
+    preferences.end(); // Close Preferences
 }

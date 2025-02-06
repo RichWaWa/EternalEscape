@@ -47,10 +47,11 @@ bool mazeScreenOpenLast = false; //is the maze screen previously open?
 void setup() {
   Serial.begin(115200);
   analogReadResolution(10);
+
+  waitForSerial();  //debug statement 
   // Initialize the TFT display
   initScreen();
-  waitForSerial();  //debug statement 
-
+  
   // Initialize the NeoPixel
   pixels.begin();
   pixels.show(); // Turn off all pixels at startup

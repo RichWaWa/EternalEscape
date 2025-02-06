@@ -52,7 +52,6 @@ void drawSettingsScreen(const String& macAddress, bool wifiStatus) {
     drawText(macAddress.c_str(), 10, 80, ILI9341_WHITE);
 
     // Draw brightness toggle
-    //brightnessLevel = loadBrightness(); //load the brightness from the settings
     drawText("Brightness:", 10, 140, ILI9341_WHITE);
     drawFillRectangle(rectX, rectY, rectWidth, rectHeight, ILI9341_WHITE); //draw button
     drawTextCentered(brightnessLevel.c_str(), rectX + (rectWidth / 2), rectY + (rectHeight / 2), ILI9341_BLACK);//add text
@@ -160,16 +159,17 @@ void loadingScreen() {
 
 // Toggle brightness levels
 void toggleBrightness() {
-    if (brightnessLevel == "HI") {
+    if (brightnessLevel.equals("HI")) {
         brightnessLevel = "MD";
         brightnessPWM = 170;    // 2/3 of 255
-    } else if (brightnessLevel == "MD") {
+    } else if (brightnessLevel.equals("MD")) {
         brightnessLevel = "LO";
         brightnessPWM = 85;     // 1/3 of 255
     } else {
         brightnessLevel = "HI";
         brightnessPWM = 255;    // 3/3 of 255
     }
+    Serial.println(brightnessLevel);    //Debug
     saveBrightness(brightnessLevel);    //save to settings
     analogWrite(TFT_LITE, brightnessPWM);   //set brightness level
 }
@@ -178,9 +178,9 @@ void toggleBrightness() {
 int loadBrightnessFromSettings(){
     brightnessLevel = loadBrightness(); //load from settings
 
-    if (brightnessLevel == "LO") {
+    if (brightnessLevel.equals("LO")) {
         brightnessPWM = 85;     // 1/3 of 255
-    } else if (brightnessLevel == "MD") {
+    } else if (brightnessLevel.equals("MD")) {
         brightnessPWM = 170;    // 2/3 of 255
     } else {
         brightnessLevel == "HI";
@@ -259,8 +259,8 @@ void drawElement(int rowA, int colA, char cellType) {
 
     // Calculate the top-left pixel coordinates of the cell
     //needs to accomodate that the cells are different sizes!
-    int x = offset + (colA - 1) * 8; //this has to be 8 for some reason. Some relationship between the cell size and the wall thickness
-    int y = offset + (rowA - 1) * 8;
+    int x = offset + (colA - 1) * ((cellSize + wallThickness) /2); //this has to be 8 for some reason. Some relationship between the cell size and the wall thickness
+    int y = offset + (rowA - 1) * ((cellSize + wallThickness) /2);
 
     // Determine what to draw based on cellType
     switch (cellType) {
