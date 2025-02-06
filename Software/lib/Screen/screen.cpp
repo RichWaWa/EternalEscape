@@ -271,6 +271,19 @@ void drawElement(int rowA, int colA, char cellType) {
             drawFillRectangle(x, y, cellSize, cellSize, BLACK);
             break;
 
+        case ',': // Wall path cell
+            if (colA % 2 == 1 && rowA % 2 == 0) {
+                // Odd column, even row: Horizontal wall
+                drawFillRectangle(x, y + (cellSize / 2 - 1), cellSize, wallThickness, BLACK);
+            } else if (colA % 2 == 0 && rowA % 2 == 1) {
+                // Even column, odd row: Vertical wall
+                drawFillRectangle(x + (cellSize / 2 - 1), y, wallThickness, cellSize, BLACK);
+            } else {
+                // Default fallback for unexpected wall cases
+                drawFillRectangle(x, y, 4, 4, GREEN);
+            }
+            break;
+
         case '#': // Wall cell
             if (colA % 2 == 1 && rowA % 2 == 0) {
                 // Odd column, even row: Horizontal wall

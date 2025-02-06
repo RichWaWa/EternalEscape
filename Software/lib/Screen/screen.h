@@ -9,7 +9,8 @@
 const uint16_t BLACK = 0x0000; 
 const uint16_t WHITE = 0xFFFF; 
 const uint16_t GREEN = 0x07E0; 
-const uint16_t RED = 0xF800; 
+const uint16_t RED = 0xF800;
+const uint16_t LIGHTRED = 0xfbcf; 
 const uint16_t ORANGE = 0xFBE0;
 const uint16_t GREY = 0xC618; 
 const uint16_t DARKGREY = 0x7BEF;
