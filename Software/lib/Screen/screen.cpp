@@ -267,7 +267,11 @@ void drawElement(int rowA, int colA, char cellType) {
 
     // Determine what to draw based on cellType
     switch (cellType) {
-        case '.': // Path cell (black 14x14)
+        case '.': // Path cell (black 14x14) //'.' is uncomputed path, '0' is computed path
+            drawFillRectangle(x, y, cellSize, cellSize, BLACK);
+            break;
+
+        case '0': // Path cell (black 14x14) //'.' is uncomputed path, '0' is computed path
             drawFillRectangle(x, y, cellSize, cellSize, BLACK);
             break;
 
