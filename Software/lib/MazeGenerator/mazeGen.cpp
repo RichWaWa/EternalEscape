@@ -15,16 +15,9 @@ vector<vector<char>>  maze;
 // Directions for movement (up, down, left, right)
 const vector<pair<int, int>> directions = {{-2, 0}, {2, 0}, {0, -2}, {0, 2}};
 
-// Function to check if a cell is a valid candidate for maze expansion
-bool isValidCell(int row, int col, const vector<vector<char>>& maze) {
-    // Ensure row and column indices are within bounds (avoiding edges)
-    bool withinBounds = (row > 0 && row < maze.size() - 1) && (col > 0 && col < maze[0].size() - 1);
-
-    // Ensure the cell is a wall ('#') and can be carved into a path
-    bool isWall = (maze[row][col] == '#');
-
-    return withinBounds && isWall;
-}
+//start and end global variables
+int startRow = 0, startCol = 0;
+int endRow = 0, endCol = 0;
 
 // Prim's Algorithm to generate the maze
 void generateMaze() {
@@ -34,42 +27,27 @@ void generateMaze() {
     //Place start ('S') and end ('E')
     placeStartAndEnd(maze);
 
-    //Render the maze to the display
+    //Render the initial maze template to the display
     renderMaze(maze);
 
     srand(time(0));  // Seed random number generator
-
-    // Find start ('S') and end ('E') positions
-    //TODO change this so the positions are saved.
-    int startRow = 0, startCol = 0;
-    int endRow = 0, endCol = 0;
-    for (int row = 0; row < maze.size(); row++) {
-        for (int col = 0; col < maze[row].size(); col++) {
-            if (maze[row][col] == 'S') {
-                startRow = row;
-                startCol = col;
-            }
-            if (maze[row][col] == 'E') {
-                endRow = row;
-                endCol = col;
-            }
-        }
-    }
-
-    // If start or end not found, exit early
-    if (startRow == -1 || startCol == -1 || endRow == -1 || endCol == -1) return;
 
     // Initialize frontier list with walls adjacent to start
     vector<pair<int, int>> frontier;
     maze[startRow][startCol] = '.'; // Mark start as a path
 
-    for (auto [dr, dc] : directions) {
+    //Create the initial frontier cells
+    for (size_t i = 0; i < directions.size(); i++) {
+        int dr = directions[i].first;
+        int dc = directions[i].second;
+
         int newRow = startRow + dr;
         int newCol = startCol + dc;
-        if (isValidCell(newRow, newCol, maze)) {
-            frontier.push_back({newRow, newCol});
-            maze[newRow][newCol] = ','; // Mark as frontier
-            drawElement(newRow, newCol, 'F'); // LIGHTRED
+
+        if (isValidWallCell(newRow, newCol, maze)) {
+            frontier.push_back({newRow, newCol}); // Add cell to frontier
+            //maze[newRow][newCol] = ','; // Mark as a frontier cell Not needed? Frontier markings are just for visual effects
+            drawElement(newRow, newCol, 'F'); // Draw in LIGHTRED
         }
     }
 
@@ -77,12 +55,16 @@ void generateMaze() {
     while (!frontier.empty()) {
         // Pick a random frontier cell
         int randIndex = rand() % frontier.size();
-        auto [cellRow, cellCol] = frontier[randIndex];
+        //extract values from frontier vector
+        int cellRow = frontier[randIndex].first;
+        int cellCol = frontier[randIndex].second;
         frontier.erase(frontier.begin() + randIndex);
 
         // Check neighbors to connect to the maze
         vector<pair<int, int>> neighbors;
-        for (auto [dr, dc] : directions) {
+        for (size_t i = 0; i < directions.size(); i++) {
+            int dr = directions[i].first;
+            int dc = directions[i].second;
             int newRow = cellRow + dr;
             int newCol = cellCol + dc;
             if (newRow > 0 && newRow < maze.size() - 1 &&
@@ -94,7 +76,9 @@ void generateMaze() {
 
         if (!neighbors.empty()) {
             // Choose a random connected path cell
-            auto [neighborRow, neighborCol] = neighbors[rand() % neighbors.size()];
+            int randIndex = rand() % neighbors.size();
+            int neighborRow = neighbors[randIndex].first;
+            int neighborCol = neighbors[randIndex].second;
 
             // Remove the wall between them
             int wallRow = (cellRow + neighborRow) / 2;
@@ -107,13 +91,17 @@ void generateMaze() {
             drawElement(cellRow, cellCol, '.'); // Black
 
             // Add new frontier cells
-            for (auto [dr, dc] : directions) {
+           for (size_t i = 0; i < directions.size(); i++) {
+                int dr = directions[i].first;
+                int dc = directions[i].second;
+
                 int newRow = cellRow + dr;
                 int newCol = cellCol + dc;
-                if (isValidCell(newRow, newCol, maze)) {
-                    frontier.push_back({newRow, newCol});
-                    maze[newRow][newCol] = ','; // Mark as frontier
-                    drawElement(newRow, newCol, 'F'); // LIGHTRED
+
+                if (isValidWallCell(newRow, newCol, maze)) {
+                    frontier.push_back({newRow, newCol}); // Add cell to frontier
+                    //maze[newRow][newCol] = ','; // Mark as a frontier cell Not needed? Frontier markings are just for visual effects
+                    drawElement(newRow, newCol, 'F'); // Draw in LIGHTRED
                 }
             }
         }
@@ -121,11 +109,23 @@ void generateMaze() {
 
     // Ensure 'E' remains unchanged
     drawElement(endRow, endCol, 'E'); // Checkered finish
+    Serial.println("Maze Drawn");
 }
 
 // Function to copy the template
 vector<vector<char>> copyMazeTemplate() {
     return mazeTemplate;
+}
+
+// Function to check if a cell is a valid candidate for maze expansion
+bool isValidWallCell(int row, int col, const vector<vector<char>>& maze) {
+    // Ensure row and column indices are within bounds (avoiding edges)
+    bool withinBounds = (row > 0 && row < maze.size() - 1) && (col > 0 && col < maze[0].size() - 1);
+
+    // Ensure the cell is a wall ('#') and can be carved into a path
+    bool isWall = (maze[row][col] == '#');
+
+    return withinBounds && isWall;
 }
 
 // Function to choose a random "#" for start ('S') and end ('E')
@@ -142,6 +142,9 @@ void placeStartAndEnd(vector<vector<char>>& maze) {
         int col = rand() % cols;
         if (maze[row][col] == '.') {
             maze[row][col] = 'S';
+            //save start positions to global variables
+            startRow = row;
+            startCol = col;
             startPlaced = true;
         }
     }
@@ -153,6 +156,9 @@ void placeStartAndEnd(vector<vector<char>>& maze) {
         int col = rand() % cols;
         if (maze[row][col] == '.' && maze[row][col] != 'S') {
             maze[row][col] = 'E';
+            //save end positions to global vars
+            endRow = row;
+            endCol = col;
             endPlaced = true;
         }
     }

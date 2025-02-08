@@ -308,6 +308,11 @@ void drawElement(int rowA, int colA, char cellType) {
         case 'S': // Start
             drawFillRectangle(x, y, cellSize, cellSize, RED); // Red
             break;
+
+        case 'F': // Start
+            drawFillRectangle(x, y, cellSize, cellSize, LIGHTRED); // Red
+            break;
+
         case '*': //Border
             //Do nothing. Nothing ever happens.
             break;
