@@ -21,6 +21,8 @@ int endRow = 0, endCol = 0;
 
 // Prim's Algorithm to generate the maze
 void generateMaze() {
+    int iterationCount = 0;
+    const int MAX_ITERATIONS = 5000; // Adjust based on expected maze complexity
     //Copy the template
     vector<vector<char>> maze = copyMazeTemplate();
 
@@ -34,12 +36,11 @@ void generateMaze() {
 
     // Initialize frontier list with walls adjacent to start
     vector<pair<int, int>> frontier;
-    //maze[startRow][startCol] = '.'; // Mark start as a path
 
     //Create the initial frontier cells
-    Serial.println("Directions size" + String(directions.size()));
+    //Serial.println("Directions size" + String(directions.size()));
     for (size_t i = 0; i < directions.size(); i++) {
-        Serial.println("Creating Initial Frontier");
+        //Serial.println("Creating Initial Frontier");
         int dr = directions[i].first;
         int dc = directions[i].second;
 
@@ -48,7 +49,6 @@ void generateMaze() {
 
         if (isValidCell(newRow, newCol, '.', maze)) { //check if the cell is a valid path
             frontier.push_back({newRow, newCol}); // Add cell to frontier
-            //maze[newRow][newCol] = ','; // Mark as a frontier cell Not needed? Frontier markings are just for visual effects
             drawElement(newRow, newCol, 'F'); // Draw in LIGHTRED
             delay(100);
         }
@@ -56,7 +56,11 @@ void generateMaze() {
 
     // Process frontier list
     while (!frontier.empty()) {
-        Serial.println("Processing Frontier list!");
+        if (++iterationCount > MAX_ITERATIONS) {
+            Serial.println("Error: Exceeded max iterations. Breaking loop.");
+            break; // Exit if the loop runs too long
+        }
+        //Serial.println("Processing Frontier list!");
         // Pick a random frontier cell
         int randIndex = rand() % frontier.size();
         //extract values from frontier vector
@@ -71,11 +75,9 @@ void generateMaze() {
             int dc = directions[i].second;
             int newRow = cellRow + dr;
             int newCol = cellCol + dc;
-            if (newRow > 0 && newRow < maze.size() - 1 &&
-                newCol > 0 && newCol < maze[0].size() - 1 &&
-                maze[newRow][newCol] == '.') { //TODO replace with isvalidcell function
+            if (isValidCell(newRow, newCol, '.', maze)) {
                 neighbors.push_back({newRow, newCol});
-                Serial.println("Neighbor Found");
+                //Serial.println("Neighbor Found");
             }
         }
 
@@ -90,7 +92,7 @@ void generateMaze() {
             int wallCol = (cellCol + neighborCol) / 2;
             maze[wallRow][wallCol] = ','; //mark as a path where a former wall was
             drawElement(wallRow, wallCol, ','); // Black
-            Serial.println("Removing Wall!!");
+            //Serial.println("Removing Wall!!");
 
             // Mark new cell as part of the maze
             maze[cellRow][cellCol] = '0';
@@ -104,11 +106,10 @@ void generateMaze() {
                 int newRow = cellRow + dr;
                 int newCol = cellCol + dc;
 
-                if (isValidCell(newRow, newCol, '.', maze)) {
+                if (isValidCell(newRow, newCol, '.', maze) && !inFrontier(newRow, newCol, frontier)) {
                     frontier.push_back({newRow, newCol}); // Add cell to frontier
-                    //maze[newRow][newCol] = ','; // Mark as a frontier cell Not needed? Frontier markings are just for visual effects
                     drawElement(newRow, newCol, 'F'); // Draw in LIGHTRED
-                    delay(100);
+                    delay(100); //100ms delay
                 }
             }
         }
@@ -126,13 +127,22 @@ vector<vector<char>> copyMazeTemplate() {
 
 // Function to check if a cell is a valid candidate for maze expansion
 bool isValidCell(int row, int col, char element, const vector<vector<char>>& maze) {
-    // Ensure row and column indices are within bounds (avoiding edges)
-    bool withinBounds = (row > 0 && row < maze.size() - 1) && (col > 0 && col < maze[0].size() - 1);
+    // First, check if the row and column are within valid bounds.
+    if (row <= 0 || row >= maze.size() - 1 || col <= 0 || col >= maze[0].size() - 1) {
+        return false;
+    }
+    // Now it's safe to access maze[row][col]
+    return (maze[row][col] == element);
+}
 
-    // Ensure the cell in question is the correct one we need
-    bool isValid = (maze[row][col] == element);
-
-    return withinBounds && isValid;
+// Check if a proposed frontier cell is already in the frontier.
+bool inFrontier(int row, int col, const vector<pair<int, int>>& frontier) {
+    for (size_t i = 0; i < frontier.size(); i++) {
+        if (frontier[i].first == row && frontier[i].second == col) {
+            return true;
+        }
+    }
+    return false;
 }
 
 // Function to choose a random "#" for start ('S') and end ('E')
@@ -145,11 +155,10 @@ void placeStartAndEnd(vector<vector<char>>& maze) {
     // Randomly select start
     bool startPlaced = false;
     while (!startPlaced) {
-        int row = rand() % rows;
-        int col = rand() % cols;
+        int row = 1 + rand() % (rows - 2); // rows 1 to rows-2
+        int col = 1 + rand() % (cols - 2); // cols 1 to cols-2
         if (maze[row][col] == '.') {
-            //maze[row][col] = 'S'; //TODO May not need this
-            //save start positions to global variables
+            //save start pos to global vars
             startRow = row;
             startCol = col;
             startPlaced = true;
@@ -159,11 +168,10 @@ void placeStartAndEnd(vector<vector<char>>& maze) {
     // Randomly select end
     bool endPlaced = false;
     while (!endPlaced) {
-        int row = rand() % rows;
-        int col = rand() % cols;
-        if (maze[row][col] == '.' && maze[row][col] != 'S') {
-            //maze[row][col] = 'E'; //TODO Not Needed?
-            //save end positions to global vars
+        int row = 1 + rand() % (rows - 2);
+        int col = 1 + rand() % (cols - 2);
+        if (maze[row][col] == '.' && (row != startRow || col != startCol)) {
+            //save end pos to global vars
             endRow = row;
             endCol = col;
             endPlaced = true;

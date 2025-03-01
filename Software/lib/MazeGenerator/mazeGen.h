@@ -45,6 +45,7 @@ vector<vector<char>> copyMazeTemplate();
 void placeStartAndEnd(vector<vector<char>>& maze);
 void renderMaze(const vector<vector<char>>& maze);
 bool isValidCell(int row, int col, char element, const vector<vector<char>>& maze);
+bool inFrontier(int row, int col, const vector<pair<int, int>>& frontier);
 //void drawMazeTemplate();
 
 #endif // MAZEGEN_H

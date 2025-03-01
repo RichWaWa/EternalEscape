@@ -59,7 +59,7 @@ void setup() {
   //Get MAC address
   macAddr = getMACAddress();
   //Connect to WiFi 
-  connectToWiFi();
+  //connectToWiFi();
 }
 
 ////////////////////////////////////////////////////
