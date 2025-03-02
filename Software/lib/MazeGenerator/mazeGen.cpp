@@ -18,6 +18,8 @@ const vector<pair<int, int>> directions = {{-2, 0}, {2, 0}, {0, -2}, {0, 2}};
 //start and end global variables
 int startRow = 0, startCol = 0;
 int endRow = 0, endCol = 0;
+//render speed
+const int speedMS = 70;
 
 // Prim's Algorithm to generate the maze
 void generateMaze() {
@@ -36,7 +38,6 @@ void generateMaze() {
     vector<pair<int, int>> frontier;
 
     //Create the initial frontier cells
-    //Serial.println("Directions size" + String(directions.size()));
     for (size_t i = 0; i < directions.size(); i++) {
         //Serial.println("Creating Initial Frontier");
         int dr = directions[i].first;
@@ -48,7 +49,7 @@ void generateMaze() {
         if (isValidCell(newRow, newCol, '.', maze)) { //check if the cell is a valid path
             frontier.push_back({newRow, newCol}); // Add cell to frontier
             drawElement(newRow, newCol, 'F'); // Draw in LIGHTRED
-            delay(100);
+            delay(speedMS);
         }
     }
 
@@ -69,7 +70,7 @@ void generateMaze() {
             int dc = directions[i].second;
             int newRow = cellRow + dr;
             int newCol = cellCol + dc;
-            if (isValidCell(newRow, newCol, '.', maze) || isValidCell(newRow, newCol, '0', maze)) {
+            if (isValidCell(newRow, newCol, '0', maze)) {
                 neighbors.push_back({newRow, newCol});
                 //Serial.println("Neighbor Found");
             }
@@ -103,7 +104,7 @@ void generateMaze() {
                 if (isValidCell(newRow, newCol, '.', maze) && !inFrontier(newRow, newCol, frontier)) {
                     frontier.push_back({newRow, newCol}); // Add cell to frontier
                     drawElement(newRow, newCol, 'F'); // Draw in LIGHTRED
-                    delay(100); //100ms delay
+                    delay(speedMS); //100ms delay
                 }
             }
         }
@@ -155,6 +156,8 @@ void placeStartAndEnd(vector<vector<char>>& maze) {
             //save start pos to global vars
             startRow = row;
             startCol = col;
+            // Mark new cell as part of the maze
+            maze[startRow][startCol] = '0';
             startPlaced = true;
         }
     }
