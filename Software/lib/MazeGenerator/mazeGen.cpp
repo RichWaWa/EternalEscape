@@ -21,8 +21,6 @@ int endRow = 0, endCol = 0;
 
 // Prim's Algorithm to generate the maze
 void generateMaze() {
-    int iterationCount = 0;
-    const int MAX_ITERATIONS = 5000; // Adjust based on expected maze complexity
     //Copy the template
     vector<vector<char>> maze = copyMazeTemplate();
 
@@ -56,10 +54,6 @@ void generateMaze() {
 
     // Process frontier list
     while (!frontier.empty()) {
-        if (++iterationCount > MAX_ITERATIONS) {
-            Serial.println("Error: Exceeded max iterations. Breaking loop.");
-            break; // Exit if the loop runs too long
-        }
         //Serial.println("Processing Frontier list!");
         // Pick a random frontier cell
         int randIndex = rand() % frontier.size();
@@ -75,7 +69,7 @@ void generateMaze() {
             int dc = directions[i].second;
             int newRow = cellRow + dr;
             int newCol = cellCol + dc;
-            if (isValidCell(newRow, newCol, '.', maze)) {
+            if (isValidCell(newRow, newCol, '.', maze) || isValidCell(newRow, newCol, '0', maze)) {
                 neighbors.push_back({newRow, newCol});
                 //Serial.println("Neighbor Found");
             }
