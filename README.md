@@ -1,4 +1,5 @@
 # EternalEscape
+![EternalEscapeLogo](pictures/EternalEscape.png)
 ## Main Project Repo for the EternalEscape desktop toy!
 **EternalEscape** is a desktop toy that generates and solves random mazes for endless entertainment and distraction from any productivity! 
 Designed to be both entertaining and mesmerizing, it’s the perfect addition to your workspace. 
