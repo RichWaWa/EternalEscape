@@ -27,7 +27,8 @@ The project is fully open-source and can be built using common materials and com
 - **Electronics:**
   - Adafruit Feather ESP32-S3 (2MB PSRAM)  
   - Adafruit 2.8" ILI9341 TFT Resistive Touch Display
-  - Female-to-female jumpers or wire.  
+  - Female-to-female jumpers or wire.
+      - For wire, I recommend Adafruit 22AWG Solid Core wire. (It comes in a nice box) 
 
 ---
 
