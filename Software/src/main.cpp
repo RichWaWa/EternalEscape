@@ -48,9 +48,9 @@ void setup() {
   Serial.begin(115200);
   analogReadResolution(10);
 
-  waitForSerial();  //debug statement 
   // Initialize the TFT display
   initScreen();
+  waitForSerial();  //debug statement 
   
   // Initialize the NeoPixel
   pixels.begin();
@@ -59,7 +59,7 @@ void setup() {
   //Get MAC address
   macAddr = getMACAddress();
   //Connect to WiFi 
-  //connectToWiFi();
+  connectToWiFi();
 }
 
 ////////////////////////////////////////////////////
@@ -159,7 +159,6 @@ void maze(){
       //draw the maze initially
       drawFillScreen(0xFFFF); //Fill screen with white
       generateMaze();
-      //drawMazeTemplate();
 
       //run last
       mazeScreenOpenLast = true;  //update to true to indicate its been run initially
