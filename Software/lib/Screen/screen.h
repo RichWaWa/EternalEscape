@@ -11,7 +11,10 @@ const uint16_t WHITE = 0xFFFF;
 const uint16_t GREEN = 0x07E0; 
 const uint16_t RED = 0xF800;
 const uint16_t LIGHTRED = 0xfbcf; 
-const uint16_t ORANGE = 0xFBE0;
+const uint16_t ORANGE = 0xFBE0; //Orange Player
+const uint16_t LIGHTORANGE = 0xFCE5; //Orange Player Trail
+const uint16_t BLUE = 0x001F;  //Blue Player
+const uint16_t LIGHTBLUE = 0x7DFF;  //Blue Player Trail
 const uint16_t GREY = 0xC618; 
 const uint16_t DARKGREY = 0x7BEF;
 

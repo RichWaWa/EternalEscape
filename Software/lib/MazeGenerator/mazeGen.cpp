@@ -127,6 +127,7 @@ vector<pair<int, int>> getStartPositions()
 }
 
 // Function to check if a cell is a valid candidate for maze expansion
+//The isValidCell function checks if we are in bounds, AND if the element in question is the one we are looking for at row, col
 bool isValidCell(int row, int col, char element, const vector<vector<char>>& maze) {
     // First, check if the row and column are within valid bounds.
     if (row <= 0 || row >= maze.size() - 1 || col <= 0 || col >= maze[0].size() - 1) {

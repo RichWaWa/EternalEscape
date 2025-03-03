@@ -6,6 +6,7 @@
 #include "settings.h"   //store device settings
 #include "mazeGen.h"
 #include "player.h"
+#include "mazeSolver.h"
 
 // Pin definitions
 #define NEOPIXEL_PIN 33        // Pin for the onboard NeoPixel
@@ -17,7 +18,7 @@ int16_t x, y, z;
 //Misc Global variables
 unsigned long lastPlayerMoveTime = 0;
 bool mazeSolved = false;
-vector<pair<int, int>> playerPosition;
+vector<pair<int, int>> tempPosition = {{0, 0}};
 //Misc Settings TODO: Move these
 unsigned const long playerMoveSpeed = 500;
 static const int holdToggleValue = 3000;        //value for how long you need to hold on the display to access the settings.
@@ -142,26 +143,32 @@ void maze(){
       //draw the maze initially
       drawFillScreen(0xFFFF); //Fill screen with white
       generateMaze();
-
+      mazeSolved = false;
       //run last
       mazeScreenOpenLast = true;  //update to true to indicate its been run initially
     }else{
+      tempPosition = {{0, 0}};
+      //Player player;
       if(!mazeSolved){
         //create player
         Player player;
         // Find Start and store in player positions
         player.clearPositions(); // Ensure it's empty before starting
         player.addPosition(getStartPositions()[0].first, getStartPositions()[0].second);
-
-    // Make the initial movement
       }
+
       //update the maze as the player moves here.
       if (millis() - lastPlayerMoveTime > playerMoveSpeed) {
         lastPlayerMoveTime = millis();
-        //Player code calls go here
-        //Create a long vector pair of positions that it travels, then work backwards for a dead end.
-        
-
+        // Player code calls go here
+        // Update the solver path with one recursive step.
+        tempPosition = randRecursiveMazeSolver(mazeGetter(), player.getPositions(), 'O', 'x');
+        player.addPosition(tempPosition[0].first, tempPosition[0].second);
+        // Check if we've reached the end (for example, if the last cell is 'E')
+        if (!player.getPositions().empty() && maze[player.getPositions().back().first][player.getPositions().back().second] == 'E') {
+            mazeSolved = true;
+            Serial.println("Maze Solved!");
+        }
         Serial.println("The player shall move now!");
         return;
       }

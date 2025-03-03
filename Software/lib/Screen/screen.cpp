@@ -309,12 +309,40 @@ void drawElement(int rowA, int colA, char cellType) {
             drawFinishSquare(x, y, cellSize); // Draws Checkered Shape
             break;
 
-        case 'S': // Start
-            drawFillRectangle(x, y, cellSize, cellSize, RED); // Red
+        case 'F': // Frontier
+            drawFillRectangle(x, y, cellSize, cellSize, LIGHTRED);
+            break;
+        
+        case 'O': // Orange Player
+            drawFillRectangle(x, y, cellSize, cellSize, ORANGE);
             break;
 
-        case 'F': // Start
-            drawFillRectangle(x, y, cellSize, cellSize, LIGHTRED); // Red
+        case 'B': // Blue Player
+            drawFillRectangle(x, y, cellSize, cellSize, BLUE);
+            break;
+
+        case 'x': // Orange Path
+            if (colA % 2 == 1 && rowA % 2 == 0) {
+                // Odd column, even row: Horizontal wall
+                drawFillRectangle(x, y + (cellSize / 2 - 1), cellSize, wallThickness, LIGHTORANGE);
+            } else if (colA % 2 == 0 && rowA % 2 == 1) {
+                // Even column, odd row: Vertical wall
+                drawFillRectangle(x + (cellSize / 2 - 1), y, wallThickness, cellSize, LIGHTORANGE);
+            } else {
+                drawFillRectangle(x, y, cellSize, cellSize, LIGHTORANGE);
+            }
+            break;
+
+        case 'z': // Blue Path
+            if (colA % 2 == 1 && rowA % 2 == 0) {
+                // Odd column, even row: Horizontal wall
+                drawFillRectangle(x, y + (cellSize / 2 - 1), cellSize, wallThickness, LIGHTBLUE);
+            } else if (colA % 2 == 0 && rowA % 2 == 1) {
+                // Even column, odd row: Vertical wall
+                drawFillRectangle(x + (cellSize / 2 - 1), y, wallThickness, cellSize, LIGHTBLUE);
+            } else {
+                drawFillRectangle(x, y, cellSize, cellSize, LIGHTBLUE);
+            }
             break;
 
         case '*': //Border
