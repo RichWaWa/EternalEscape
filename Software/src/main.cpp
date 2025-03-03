@@ -5,6 +5,7 @@
 #include "networking.h" //Networking class
 #include "settings.h"   //store device settings
 #include "mazeGen.h"
+#include "player.h"
 
 // Pin definitions
 #define NEOPIXEL_PIN 33        // Pin for the onboard NeoPixel
@@ -13,13 +14,14 @@
 //Touch screen variables
 int16_t x, y, z;
 
-// Create instances for the display and NeoPixel
-//Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
-Adafruit_NeoPixel pixels(NUMPIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
-
-// Global variables for color cycling
-int colorIndex = 0;
-uint16_t colors[] = {ILI9341_RED, ILI9341_GREEN, ILI9341_BLUE};
+//Misc Global variables
+unsigned long lastPlayerMoveTime = 0;
+bool mazeSolved = false;
+vector<pair<int, int>> playerPosition;
+//Misc Settings TODO: Move these
+unsigned const long playerMoveSpeed = 500;
+static const int holdToggleValue = 3000;        //value for how long you need to hold on the display to access the settings.
+static const int debounceDelay = 500;           //delay for the touch debounce.
 
 //State Machine for Display
 enum State { MAZESCREEN, SETTINGS };
@@ -47,19 +49,16 @@ bool mazeScreenOpenLast = false; //is the maze screen previously open?
 void setup() {
   Serial.begin(115200);
   analogReadResolution(10);
-
+  srand(time(0));  // Seed random number generator
   // Initialize the TFT display
   initScreen();
   waitForSerial();  //debug statement 
-  
-  // Initialize the NeoPixel
-  pixels.begin();
-  pixels.show(); // Turn off all pixels at startup
 
   //Get MAC address
   macAddr = getMACAddress();
   //Connect to WiFi 
   connectToWiFi();
+  unsigned long mainStartTime = millis();
 }
 
 ////////////////////////////////////////////////////
@@ -83,8 +82,6 @@ void loop() {
 
 //State Machine updates for display
 void updateStateMachine() {
-  static int holdToggleValue = 3000;        //value for how long you need to hold on the display to access the settings.
-  static int debounceDelay = 500;           //delay for the touch debounce.
   // Check if the touch is within the valid range
   if (z > MINPRESSURE && z < MAXPRESSURE) {
     lastValidTouchTime = millis(); //update the last valid touch time
@@ -121,20 +118,6 @@ void updateStateMachine() {
   }
 }//END State machine block
 
-//Debug statement
-void waitForSerial(unsigned long timeout) { //Waits for a serial connection before pursuing with the program (FOR DEBUG USE ONLY)
-    unsigned long startTime = millis();
-    // Wait for Serial to connect
-    Serial.println("Waiting for serial connection...");
-    while (!Serial) {
-        if (millis() - startTime > timeout) {
-            Serial.println("Serial connection timeout. Continuing without serial...");
-            return;
-        }
-    }
-    Serial.println("Serial connection established.");
-}//END waitForSerial
-
 //Draw settings screen
 void settings(){
   if (currentState == SETTINGS) {
@@ -163,8 +146,25 @@ void maze(){
       //run last
       mazeScreenOpenLast = true;  //update to true to indicate its been run initially
     }else{
-      //update the maze as the player moves here.
+      if(!mazeSolved){
+        //create player
+        Player player;
+        // Find Start and store in player positions
+        player.clearPositions(); // Ensure it's empty before starting
+        player.addPosition(getStartPositions()[0].first, getStartPositions()[0].second);
 
+    // Make the initial movement
+      }
+      //update the maze as the player moves here.
+      if (millis() - lastPlayerMoveTime > playerMoveSpeed) {
+        lastPlayerMoveTime = millis();
+        //Player code calls go here
+        //Create a long vector pair of positions that it travels, then work backwards for a dead end.
+        
+
+        Serial.println("The player shall move now!");
+        return;
+      }
 
     }//end open last else
   }else{
@@ -172,38 +172,16 @@ void maze(){
   }//END Display Screen updates
 }
 
-//Draw the colorStrobe
-void colorStrobe(){
-  static unsigned long strobeTimer = 0;
-
-  if (currentState == MAZESCREEN) {
-    if(!mazeScreenOpenLast){
-      //draw the maze initially
-
-
-      //run last
-      mazeScreenOpenLast = true;  //update to true to indicate its been run initially
-    }else{
-      //update the maze as the player moves here.
-
-
-      if (millis() - strobeTimer >= 1000) {
-      strobeTimer = millis();
-
-      static int colorIndex = 0;
-      uint16_t colors[] = {ILI9341_RED, ILI9341_GREEN, ILI9341_BLUE};
-      drawStrobeScreen(colors[colorIndex]);
-
-      switch (colorIndex) {
-        case 0: pixels.setPixelColor(0, pixels.Color(255, 0, 0)); break;
-        case 1: pixels.setPixelColor(0, pixels.Color(0, 255, 0)); break;
-        case 2: pixels.setPixelColor(0, pixels.Color(0, 0, 255)); break;
+//Debug statement
+void waitForSerial(unsigned long timeout) { //Waits for a serial connection before pursuing with the program (FOR DEBUG USE ONLY)
+  unsigned long startTime = millis();
+  // Wait for Serial to connect
+  Serial.println("Waiting for serial connection...");
+  while (!Serial) {
+      if (millis() - startTime > timeout) {
+          Serial.println("Serial connection timeout. Continuing without serial...");
+          return;
       }
-      pixels.show();
-      colorIndex = (colorIndex + 1) % 3;
-      }
-    }//end open last else
-  }else{
-    mazeScreenOpenLast = false; //maze screen closed
-  }//END Display Screen updates
-}
+  }
+  Serial.println("Serial connection established.");
+}//END waitForSerial

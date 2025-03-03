@@ -9,14 +9,14 @@ Implementation of Prims algorithm guided by the following sources
 https://weblog.jamisbuck.org/2011/1/10/maze-generation-prim-s-algorithm
 https://github.com/jamis/csmazes
 */
-//char maze[31][41]; //the maze which will be built
+//the maze which will be built
 vector<vector<char>>  maze;
 
 // Directions for movement (up, down, left, right)
 const vector<pair<int, int>> directions = {{-2, 0}, {2, 0}, {0, -2}, {0, 2}};
 
 //start and end global variables
-int startRow = 0, startCol = 0;
+vector<pair<int, int>> startPositions = {{0, 0}};
 int endRow = 0, endCol = 0;
 //render speed
 const int speedMS = 70;
@@ -25,26 +25,21 @@ const int speedMS = 70;
 void generateMaze() {
     //Copy the template
     vector<vector<char>> maze = copyMazeTemplate();
-
     //Place start ('S') and end ('E')
     placeStartAndEnd(maze);
-
     //Render the initial maze template to the display
     renderMaze(maze);
-
     srand(time(0));  // Seed random number generator
-
     // Initialize frontier list with walls adjacent to start
     vector<pair<int, int>> frontier;
-
     //Create the initial frontier cells
     for (size_t i = 0; i < directions.size(); i++) {
         //Serial.println("Creating Initial Frontier");
         int dr = directions[i].first;
         int dc = directions[i].second;
 
-        int newRow = startRow + dr;
-        int newCol = startCol + dc;
+        int newRow = startPositions[0].first + dr;
+        int newCol = startPositions[0].second + dc;
 
         if (isValidCell(newRow, newCol, '.', maze)) { //check if the cell is a valid path
             frontier.push_back({newRow, newCol}); // Add cell to frontier
@@ -107,6 +102,7 @@ void generateMaze() {
                     delay(speedMS); //100ms delay
                 }
             }
+            delay(speedMS); //100ms delay
         }
     }
 
@@ -118,6 +114,16 @@ void generateMaze() {
 // Function to copy the template
 vector<vector<char>> copyMazeTemplate() {
     return mazeTemplate;
+}
+
+// Getter for the maze
+vector<vector<char>> mazeGetter() {
+    return maze;
+}
+
+vector<pair<int, int>> getStartPositions()
+{
+    return startPositions;
 }
 
 // Function to check if a cell is a valid candidate for maze expansion
@@ -154,10 +160,10 @@ void placeStartAndEnd(vector<vector<char>>& maze) {
         int col = 1 + rand() % (cols - 2); // cols 1 to cols-2
         if (maze[row][col] == '.') {
             //save start pos to global vars
-            startRow = row;
-            startCol = col;
+            startPositions[0].first  = row;
+            startPositions[0].second = col;
             // Mark new cell as part of the maze
-            maze[startRow][startCol] = '0';
+            maze[startPositions[0].first][startPositions[0].second] = '0';
             startPlaced = true;
         }
     }
@@ -167,7 +173,7 @@ void placeStartAndEnd(vector<vector<char>>& maze) {
     while (!endPlaced) {
         int row = 1 + rand() % (rows - 2);
         int col = 1 + rand() % (cols - 2);
-        if (maze[row][col] == '.' && (row != startRow || col != startCol)) {
+        if (maze[row][col] == '.' && (row != startPositions[0].first || col != startPositions[0].second)) {
             //save end pos to global vars
             endRow = row;
             endCol = col;
