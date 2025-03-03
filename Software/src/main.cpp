@@ -19,6 +19,7 @@ int16_t x, y, z;
 unsigned long lastPlayerMoveTime = 0;
 bool mazeSolved = false;
 vector<pair<int, int>> tempPosition = {{0, 0}};
+vector<vector<char>> builtMaze;
 //Misc Settings TODO: Move these
 unsigned const long playerMoveSpeed = 500;
 static const int holdToggleValue = 3000;        //value for how long you need to hold on the display to access the settings.
@@ -138,11 +139,14 @@ void settings(){
 
 //Draw the maze
 void maze(){
+  //create player
+  static Player player;
   if (currentState == MAZESCREEN) {
     if(!mazeScreenOpenLast){
       //draw the maze initially
       drawFillScreen(0xFFFF); //Fill screen with white
       generateMaze();
+      builtMaze = mazeGetter();
       mazeSolved = false;
       //run last
       mazeScreenOpenLast = true;  //update to true to indicate its been run initially
@@ -150,8 +154,6 @@ void maze(){
       tempPosition = {{0, 0}};
       //Player player;
       if(!mazeSolved){
-        //create player
-        Player player;
         // Find Start and store in player positions
         player.clearPositions(); // Ensure it's empty before starting
         player.addPosition(getStartPositions()[0].first, getStartPositions()[0].second);
@@ -162,10 +164,9 @@ void maze(){
         lastPlayerMoveTime = millis();
         // Player code calls go here
         // Update the solver path with one recursive step.
-        tempPosition = randRecursiveMazeSolver(mazeGetter(), player.getPositions(), 'O', 'x');
-        player.addPosition(tempPosition[0].first, tempPosition[0].second);
+        randRecursiveMazeSolver(builtMaze, player.getPositions(), 'O', 'x');
         // Check if we've reached the end (for example, if the last cell is 'E')
-        if (!player.getPositions().empty() && maze[player.getPositions().back().first][player.getPositions().back().second] == 'E') {
+        if (!player.getPositions().empty() && mazeGetter()[player.getPositions().back().first][player.getPositions().back().second] == 'E') {
             mazeSolved = true;
             Serial.println("Maze Solved!");
         }

@@ -11,7 +11,7 @@ using namespace std;
 /// @param maze The maze (modified as cells are visited).
 /// @param position The current path (a vector of cell coordinates).
 /// @return The updated path after making one move (or backtracking if no move is valid).
-vector<pair<int, int>> randRecursiveMazeSolver(vector<vector<char>>& maze, vector<pair<int, int>> position, const char playerChar, const char playerPathChar) {
+void randRecursiveMazeSolver(vector<vector<char>>& maze, vector<pair<int, int>>& position, const char playerChar, const char playerPathChar) {
     // Seed the random generator (ideally done once at program start, not per function call)
     //TODO Not needed, we do this at the initialization of the device
     static bool seeded = false;
@@ -53,8 +53,7 @@ vector<pair<int, int>> randRecursiveMazeSolver(vector<vector<char>>& maze, vecto
 
             // Draw the new player position ('P')
             drawElement(newRow, newCol, playerChar);
-
-            return position;  // Continue moving forward
+            return;  // Continue moving forward
         }
     }
 
@@ -64,5 +63,5 @@ vector<pair<int, int>> randRecursiveMazeSolver(vector<vector<char>>& maze, vecto
         drawElement(currentRow, currentCol, playerPathChar); // Mark backtracked path
     }
 
-    return position;
+    return;
 }

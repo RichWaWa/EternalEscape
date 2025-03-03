@@ -10,8 +10,8 @@ void Player::addPosition(int row, int col) {
     playerPositions.push_back({row, col});
 }
 
-// Get the positions vector
-const std::vector<std::pair<int, int>>& Player::getPositions() const {
+// Get the positions vector pair
+std::vector<std::pair<int, int>>& Player::getPositions(){
     return playerPositions;
 }
 

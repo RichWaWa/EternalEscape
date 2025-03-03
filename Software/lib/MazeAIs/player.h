@@ -12,8 +12,8 @@ public:
     // Add a new position to the tracker
     void addPosition(int row, int col);
 
-    // Get a constant reference to the vector of positions
-    const std::vector<std::pair<int, int>>& getPositions() const;
+    // Get a reference to the vector of positions
+    std::vector<std::pair<int, int>>& getPositions();
 
     // Clear all stored positions
     void clearPositions();
