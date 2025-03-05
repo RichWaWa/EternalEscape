@@ -155,8 +155,9 @@ void maze(){
       //Player player;
       if(!mazeSolved){
         // Find Start and store in player positions
-        player.clearPositions(); // Ensure it's empty before starting
+        player.clearPositions();  //reset the path
         player.addPosition(getStartPositions()[0].first, getStartPositions()[0].second);
+        Serial.println("Player Setup Complete");
       }
 
       //update the maze as the player moves here.
