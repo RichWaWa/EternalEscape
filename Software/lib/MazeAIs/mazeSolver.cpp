@@ -41,11 +41,10 @@ void randRecursiveMazeSolver(vector<vector<char>>& maze, vector<pair<int, int>>&
         Serial.println(dir);
         int newRow = currentRow + pathDirections[dir].first;
         int newCol = currentCol + pathDirections[dir].second;
-        printDebugInfo("Attempting to move to", newRow, newCol);
+        printDebugInfo("I want to move to", newRow, newCol);
         int wallRow = currentRow + wallDirections[dir].first;
         int wallCol = currentCol + wallDirections[dir].second;
-        printDebugInfo("Attempting to verify wall at", wallRow, wallCol);
-        printDebugInfo("Directions Computed");
+        printDebugInfo("I want to verify wall at", wallRow, wallCol);
         // Validate move
         if (!isValidMove(newRow, newCol, wallRow, wallCol, maze)) {
             printDebugInfo("Attempted move was not valid");
