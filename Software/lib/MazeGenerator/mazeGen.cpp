@@ -24,7 +24,7 @@ const int speedMS = 70;
 // Prim's Algorithm to generate the maze
 void generateMaze() {
     //Copy the template
-    vector<vector<char>> maze = copyMazeTemplate();
+    maze = copyMazeTemplate();
     //Place start ('S') and end ('E')
     placeStartAndEnd(maze);
     //Render the initial maze template to the display

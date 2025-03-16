@@ -38,7 +38,7 @@ void randRecursiveMazeSolver(vector<vector<char>>& maze, vector<pair<int, int>>&
     // Attempt all directions in the randomized order
     for (int i = 0; i < 4; i++) {
         int dir = directions[i];  // Pick a shuffled direction
-        Serial.println(dir);
+        Serial.println("Moving in direction" + dir);
         int newRow = currentRow + pathDirections[dir].first;
         int newCol = currentCol + pathDirections[dir].second;
         printDebugInfo("I want to move to", newRow, newCol);
@@ -102,22 +102,29 @@ void printDebugInfo(const char* message, int row, int col) {
 /// @param wallCol Column of the wall being crossed.
 /// @param maze The maze.
 /// @return True if the move is valid.
-bool isValidMove(int newRow, int newCol, int wallRow, int wallCol, const vector<vector<char>>& maze) {
+bool isValidMove(int newRow, int newCol, int wallRow, int wallCol, const vector<vector<char>>& mazeCheck) {
     // Check if the new position is within bounds and a valid path
     Serial.println("Validating Move");
     // First, check if the row and column are within valid bounds.
-    if ((newRow <= 0 || newRow >= maze.size() - 1 || newCol <= 0 || newCol >= maze[0].size() - 1) || !(maze[newRow][newCol] == '0')) {
-        printDebugInfo("Out of bounds or invalid path", newRow, newCol);
+    if (newRow <= 0 || newRow >= mazeCheck.size() - 1 || newCol <= 0 || newCol >= mazeCheck[0].size() - 1) {
+        printDebugInfo("Out of bounds", newRow, newCol);
         return false;
     }
+    
+    // Now it's safe to access maze[newRow][newCol]. Check if it's a valid path.
+    if (mazeCheck[newRow][newCol] != '0') {
+        printDebugInfo("Invalid path cell", newRow, newCol);
+        return false;
+    }
+
     Serial.println("Checked Path");
     // Check if the wall is a valid passage
-    if (wallRow <= 0 || wallRow >= maze.size() - 1 || wallCol <= 0 || wallCol >= maze[0].size() - 1) {
+    if (wallRow <= 0 || wallRow >= mazeCheck.size() - 1 || wallCol <= 0 || wallCol >= mazeCheck[0].size() - 1) {
         printDebugInfo("Wall out of bounds", wallRow, wallCol);
         return false;
     }
     Serial.println("Checked Wall Bounds");
-    if (maze[wallRow][wallCol] != ',') {
+    if (mazeCheck[wallRow][wallCol] != ',') {
         printDebugInfo("Wall is not a valid passage", wallRow, wallCol);
         return false;
     }
