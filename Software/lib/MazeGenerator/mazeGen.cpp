@@ -25,8 +25,8 @@ const int speedMS = 70;
 void generateMaze() {
     //Copy the template
     maze = copyMazeTemplate();
-    //Place start ('S') and end ('E')
-    placeStartAndEnd(maze);
+    //Generate start ('S') and end ('E')
+    generateStartAndEnd(maze);
     //Render the initial maze template to the display
     renderMaze(maze);
     srand(time(0));  // Seed random number generator
@@ -148,7 +148,7 @@ bool inFrontier(int row, int col, const vector<pair<int, int>>& frontier) {
 }
 
 // Function to choose a random "#" for start ('S') and end ('E')
-void placeStartAndEnd(vector<vector<char>>& maze) {
+void generateStartAndEnd(vector<vector<char>>& maze) {
     int rows = maze.size();
     int cols = maze[0].size();
 

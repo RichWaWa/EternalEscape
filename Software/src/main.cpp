@@ -20,6 +20,7 @@ unsigned long lastPlayerMoveTime = 0;
 bool mazeSolved = false;
 vector<pair<int, int>> tempPosition = {{0, 0}};
 vector<vector<char>> builtMaze;
+bool playerSetupComplete = false;
 //Misc Settings TODO: Move these
 unsigned const long playerMoveSpeed = 500;
 static const int holdToggleValue = 3000;        //value for how long you need to hold on the display to access the settings.
@@ -144,22 +145,23 @@ void maze(){
   if (currentState == MAZESCREEN) {
     if(!mazeScreenOpenLast){
       //draw the maze initially
-      drawFillScreen(0xFFFF); //Fill screen with white
+      //drawFillScreen(0xFFFF); //Fill screen with white
       generateMaze();
       builtMaze = mazeGetter();
       mazeSolved = false;
+      playerSetupComplete  = false;
       //run last
       mazeScreenOpenLast = true;  //update to true to indicate its been run initially
     }else{
+      //Run all the player movement stuff
       tempPosition = {{0, 0}};
-      //Player player;
-      if(!mazeSolved){
+      if(!mazeSolved && !playerSetupComplete){
         // Find Start and store in player positions
         player.clearPositions();  //reset the path
         player.addPosition(getStartPositions()[0].first, getStartPositions()[0].second);
+        playerSetupComplete = true;
         Serial.println("Player Setup Complete");
       }
-
       //update the maze as the player moves here.
       if (millis() - lastPlayerMoveTime > playerMoveSpeed) {
         lastPlayerMoveTime = millis();
@@ -174,7 +176,6 @@ void maze(){
         Serial.println("The player shall move now!");
         return;
       }
-
     }//end open last else
   }else{
     mazeScreenOpenLast = false; //maze screen closed

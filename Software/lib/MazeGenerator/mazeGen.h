@@ -44,7 +44,7 @@ void generateMaze();        //Generate the maze
 vector<vector<char>> copyMazeTemplate();
 vector<vector<char>> mazeGetter();
 vector<pair<int, int>> getStartPositions();
-void placeStartAndEnd(vector<vector<char>>& maze);
+void generateStartAndEnd(vector<vector<char>>& maze);
 void renderMaze(const vector<vector<char>>& maze);
 bool isValidCell(int row, int col, char element, const vector<vector<char>>& maze);
 bool inFrontier(int row, int col, const vector<pair<int, int>>& frontier);
