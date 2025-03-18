@@ -5,7 +5,6 @@
 #include "networking.h" //Networking class
 #include "settings.h"   //store device settings
 #include "mazeGen.h"
-#include "player.h"
 #include "mazeSolver.h"
 
 // Pin definitions
@@ -141,7 +140,7 @@ void settings(){
 //Draw the maze
 void maze(){
   //create player
-  static Player player;
+  static Player player1;
   if (currentState == MAZESCREEN) {
     if(!mazeScreenOpenLast){
       //draw the maze initially
@@ -157,8 +156,8 @@ void maze(){
       tempPosition = {{0, 0}};
       if(!mazeSolved && !playerSetupComplete){
         // Find Start and store in player positions
-        player.clearPositions();  //reset the path
-        player.addPosition(getStartPositions()[0].first, getStartPositions()[0].second);
+        player1.clearPositions();  //reset the path
+        player1.addPosition(getStartPositions()[0].first, getStartPositions()[0].second);
         playerSetupComplete = true;
         Serial.println("Player Setup Complete");
       }
@@ -167,9 +166,9 @@ void maze(){
         lastPlayerMoveTime = millis();
         // Player code calls go here
         // Update the solver path with one recursive step.
-        randRecursiveMazeSolver(builtMaze, player.getPositions(), 'O', 'x');
+        player1.calculateMove(builtMaze, 'O', 'x');
         // Check if we've reached the end (for example, if the last cell is 'E')
-        if (!player.getPositions().empty() && mazeGetter()[player.getPositions().back().first][player.getPositions().back().second] == 'E') {
+        if (!player1.getPositions().empty() && mazeGetter()[player1.getPositions().back().first][player1.getPositions().back().second] == 'E') {
             mazeSolved = true;
             Serial.println("Maze Solved!");
         }
