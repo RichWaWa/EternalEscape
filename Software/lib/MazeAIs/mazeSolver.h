@@ -27,7 +27,7 @@ private:
     vector<pair<int, int>> playerPositions;
     //stores the direction choices for those positions. The lists should line
     vector<vector<int>> directionsList;
-    //const list of where the paths are at
+    //const list of where the paths are at{S,N,W,E}
     const vector<pair<int, int>> pathDirections = {{-2, 0}, {2, 0}, {0, -2}, {0, 2}};
     //const list of where the walls are at
     const vector<pair<int, int>> wallDirections = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};

@@ -19,7 +19,7 @@ const vector<pair<int, int>> directions = {{-2, 0}, {2, 0}, {0, -2}, {0, 2}};
 vector<pair<int, int>> startPositions = {{0, 0}};
 int endRow = 0, endCol = 0;
 //render speed
-const int speedMS = 70;
+const int speedMS = 10; //was 70
 
 // Prim's Algorithm to generate the maze
 void generateMaze() {

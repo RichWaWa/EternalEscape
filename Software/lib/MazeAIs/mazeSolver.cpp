@@ -28,11 +28,13 @@ void Player::clearPositions() {
 }
 
 /// @brief Recursively attempts to move through the maze one step.
+/// @brief This algorithm relies on the princible that in prims algorithm, there is exactly ONE way to get to any part of the maze, given any4 single starting point.
 /// @param maze The maze (modified as cells are visited).
 /// @param position The current path (a vector of cell coordinates).
 /// @param playerChar The character representing the player.
 /// @param playerPathChar The character representing the path the player has taken.
 void Player::calculateMove(vector<vector<char>>& maze, const char playerChar, const char playerPathChar) {
+    Serial.println("=========================================");
     // Ensure there is a valid starting position
     if (playerPositions.empty()) {
         printDebugInfo("Error: Player position vector is empty!");
@@ -47,37 +49,49 @@ void Player::calculateMove(vector<vector<char>>& maze, const char playerChar, co
             Serial.println("Vector lists unequal. We must of backtracked.");
             directionsList.pop_back(); 
         }else{
-            //New move, shuffle and pop back.
+            //New move, shuffle and push back.
             directionsList.push_back(shuffleDirections());
         }
     }else{
         //Firstrun condition
-        Serial.println("First Run Detected");
+        //Serial.println("First Run Detected");
         directionsList.push_back(shuffleDirections());
     }
     // Get current player position
     int currentRow = playerPositions.back().first;
     int currentCol = playerPositions.back().second;
-
     printDebugInfo("Current Position", currentRow, currentCol);
 
     // Attempt all directions in the randomized order
     for (int i = 0; i < 4; i++) {
         int dir = directionsList.back()[i];  // Pick a shuffled direction from the end of the list
-        Serial.println("Moving in direction" + dir);
+        Serial.print("Rotated Directions: ");
+        for (int N : directionsList.back()) {
+            Serial.print(N);
+            Serial.print(" ");
+        }
+        Serial.println(); // Move to a new line after printing all elements
+        //Serial.println("Moving in direction" + dir);
         int newRow = currentRow + pathDirections[dir].first;
         int newCol = currentCol + pathDirections[dir].second;
-        printDebugInfo("I want to move to", newRow, newCol);
+        //printDebugInfo("I want to move to", newRow, newCol);
         int wallRow = currentRow + wallDirections[dir].first;
         int wallCol = currentCol + wallDirections[dir].second;
-        printDebugInfo("I want to verify wall at", wallRow, wallCol);
+        //printDebugInfo("I want to verify wall at", wallRow, wallCol);
         // Validate move
         if (!isValidMove(newRow, newCol, wallRow, wallCol, maze)) {
-            printDebugInfo("Attempted move was not valid");
+            //printDebugInfo("Attempted move was not valid");
             continue;
         }
         //idea of this is to rotate the directions vector so that the first position is a direction we havnt tried yet.
-        rotate(directionsList.back().begin(), directionsList.back().begin() + i, directionsList.back().end());
+        rotate(directionsList.back().begin(), directionsList.back().begin() + (i+1), directionsList.back().end());
+        Serial.printf("Rotating: %d\n", (i + 1));
+        Serial.print("Rotated Directions: ");
+        for (int N : directionsList.back()) {
+            Serial.print(N);
+            Serial.print(" ");
+        }
+        Serial.println(); // Move to a new line after printing all elements
         printDebugInfo("Moving to", newRow, newCol);
 
         // Mark current position with trail if not start or end
@@ -86,11 +100,9 @@ void Player::calculateMove(vector<vector<char>>& maze, const char playerChar, co
             drawElement(currentRow, currentCol, playerPathChar);
             printDebugInfo("Marked trail at current position");
         }
-
         // Update the wall and new position
         drawElement(wallRow, wallCol, playerPathChar);
         playerPositions.push_back({newRow, newCol});
-
         // Draw new player position
         drawElement(newRow, newCol, playerChar);
         return;
@@ -102,6 +114,7 @@ void Player::calculateMove(vector<vector<char>>& maze, const char playerChar, co
         playerPositions.pop_back();
         //NOTE: We dont want to pop_back the directions vector, because we use it to determine if we backtracked or not
         drawElement(currentRow, currentCol, playerPathChar);
+        drawElement(playerPositions.back().first, playerPositions.back().second, playerChar);
     } else {
         printDebugInfo("Player is stuck with no way to backtrack.");
     }
@@ -112,12 +125,13 @@ vector<int> Player::shuffleDirections(){
     // Shuffle direction indices for random order of movement
     vector<int> directions = {0, 1, 2, 3};
     random_shuffle(directions.begin(), directions.end());
-    Serial.print("Shuffled directions: ");
-    for (int dir : directions) {
-        Serial.print(dir);
-        Serial.print(" ");
-    }
-    Serial.println(); // Move to a new line after printing all elements
+    //Serial.print("Shuffled directions: ");
+    //for (int dir : directions) {
+    //    Serial.print(dir);
+    //    Serial.print(" ");
+    //}
+    //Serial.println(); // Move to a new line after printing all elements
+    directions = {0, 1, 2, 3};
     return directions;
 }
 
@@ -133,28 +147,19 @@ bool Player::isValidMove(int newRow, int newCol, int wallRow, int wallCol, const
     Serial.println("Validating Move");
     // First, check if the row and column are within valid bounds.
     if (newRow <= 0 || newRow >= mazeCheck.size() - 1 || newCol <= 0 || newCol >= mazeCheck[0].size() - 1) {
-        printDebugInfo("Out of bounds", newRow, newCol);
         return false;
     }
-    
     // Now it's safe to access maze[newRow][newCol]. Check if it's a valid path.
     if (mazeCheck[newRow][newCol] != '0') {
-        printDebugInfo("Invalid path cell", newRow, newCol);
         return false;
     }
-
-    Serial.println("Checked Path");
     // Check if the wall is a valid passage
     if (wallRow <= 0 || wallRow >= mazeCheck.size() - 1 || wallCol <= 0 || wallCol >= mazeCheck[0].size() - 1) {
-        printDebugInfo("Wall out of bounds", wallRow, wallCol);
         return false;
     }
-    Serial.println("Checked Wall Bounds");
     if (mazeCheck[wallRow][wallCol] != ',') {
-        printDebugInfo("Wall is not a valid passage", wallRow, wallCol);
         return false;
     }
-    Serial.println("Checked Wall passable");
     return true;
 }
 
