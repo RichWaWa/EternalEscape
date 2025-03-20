@@ -62,9 +62,14 @@ void Player::calculateMove(vector<vector<char>>& maze, const char playerChar, co
     int currentCol = playerPositions.back().second;
     printDebugInfo("Current Position", currentRow, currentCol);
 
-    // Attempt all directions in the randomized order
+    // Attempt all directions in the randomized order. Dont change the length to 5!!! Leave at 4 to avoid infinite looping.
     for (int i = 0; i < 4; i++) {
         int dir = directionsList.back()[i];  // Pick a shuffled direction from the end of the list
+        //If this is the character 9, we know we have looped all the way through, so we need to break out of this loop.
+        if(dir == 9){
+            //if we reached the end of the direction list, break out
+            break;
+        }
         Serial.print("Rotated Directions: ");
         for (int N : directionsList.back()) {
             Serial.print(N);
@@ -131,7 +136,11 @@ vector<int> Player::shuffleDirections(){
     //    Serial.print(" ");
     //}
     //Serial.println(); // Move to a new line after printing all elements
-    directions = {0, 1, 2, 3};
+
+    //We add 9 at the end of the list to signify when we have tried every direction.
+    //This prevents it from getting stuck. 
+    directions.push_back(9);    
+    directions = {0, 1, 2, 3, 9}; 
     return directions;
 }
 
