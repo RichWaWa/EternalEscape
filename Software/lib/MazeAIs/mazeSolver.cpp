@@ -120,8 +120,8 @@ void Player::calculateMove(vector<vector<char>>& maze) {
         return;
     }
 
-    // No moves possible, backtracking
-if (playerPositions.size() > 1) {
+// No moves possible, backtracking
+    if (playerPositions.size() > 1) {
     //printDebugInfo("No valid moves, backtracking...");
     int currentRow = playerPositions.back().first;
     int currentCol = playerPositions.back().second;
@@ -143,9 +143,9 @@ if (playerPositions.size() > 1) {
 
     // Color the backtracked-to position with the player color
     drawElement(backtrackRow, backtrackCol, playerChar);
-} else {
-    printDebugInfo("Player is stuck with no way to backtrack.");
-}
+    } else {
+        printDebugInfo("Player is stuck with no way to backtrack.");
+    }
 }
 
 /// @brief shuffles the movement directions to make player movement more unique

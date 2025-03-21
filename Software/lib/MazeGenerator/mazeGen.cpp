@@ -170,7 +170,8 @@ void generateStartAndEnd(vector<vector<char>>& maze) {
             }
         }
     }
-
+    // Mark start 0 as part of the maze so the frontier can be built
+    maze[startPositions[0].first][startPositions[0].second] = '0';
     // Randomly select end
     bool endPlaced = false;
     while (!endPlaced) {
