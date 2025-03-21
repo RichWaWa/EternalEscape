@@ -321,7 +321,7 @@ void drawElement(int rowA, int colA, char cellType) {
             drawFillRectangle(x, y, cellSize, cellSize, BLUE);
             break;
 
-        case 'x': // Orange Path
+        case 'X': // Orange Path
             if (colA % 2 == 1 && rowA % 2 == 0) {
                 // Odd column, even row: Horizontal wall
                 drawFillRectangle(x, y + (cellSize / 2 - 1), cellSize, wallThickness, LIGHTORANGE);
@@ -333,7 +333,19 @@ void drawElement(int rowA, int colA, char cellType) {
             }
             break;
 
-        case 'z': // Blue Path
+        case 'x': // Orange Backtrack Path
+            if (colA % 2 == 1 && rowA % 2 == 0) {
+                // Odd column, even row: Horizontal wall
+                drawFillRectangle(x, y + (cellSize / 2 - 1), cellSize, wallThickness, DARKORANGE);
+            } else if (colA % 2 == 0 && rowA % 2 == 1) {
+                // Even column, odd row: Vertical wall
+                drawFillRectangle(x + (cellSize / 2 - 1), y, wallThickness, cellSize, DARKORANGE);
+            } else {
+                drawFillRectangle(x, y, cellSize, cellSize, DARKORANGE);
+            }
+            break;
+
+        case 'Z': // Blue Path
             if (colA % 2 == 1 && rowA % 2 == 0) {
                 // Odd column, even row: Horizontal wall
                 drawFillRectangle(x, y + (cellSize / 2 - 1), cellSize, wallThickness, LIGHTBLUE);
@@ -344,6 +356,18 @@ void drawElement(int rowA, int colA, char cellType) {
                 drawFillRectangle(x, y, cellSize, cellSize, LIGHTBLUE);
             }
             break;
+
+        case 'z': // Blue Backtrack Path
+            if (colA % 2 == 1 && rowA % 2 == 0) {
+                // Odd column, even row: Horizontal wall
+                drawFillRectangle(x, y + (cellSize / 2 - 1), cellSize, wallThickness, DARKBLUE);
+            } else if (colA % 2 == 0 && rowA % 2 == 1) {
+                // Even column, odd row: Vertical wall
+                drawFillRectangle(x + (cellSize / 2 - 1), y, wallThickness, cellSize, DARKBLUE);
+            } else {
+                drawFillRectangle(x, y, cellSize, cellSize, DARKBLUE);
+            }
+            break;  
 
         case '*': //Border
             //Do nothing. Nothing ever happens.

@@ -17,15 +17,16 @@ int16_t x, y, z;
 //Misc Global variables
 unsigned long lastPlayerMoveTime = 0;
 unsigned long mazeSolvedTime = 0;
-
 bool mazeSolved = false;
 vector<pair<int, int>> tempPosition = {{0, 0}};
 vector<vector<char>> builtMaze;
 bool playerSetupComplete = false;
-//Misc Settings TODO: Move these
-unsigned const long playerMoveSpeed = 500;      //time between each player moves
 static const int holdToggleValue = 3000;        //value for how long you need to hold on the display to access the settings.
 static const int debounceDelay = 500;           //delay for the touch debounce.
+
+//Misc Settings TODO: Move these to Settings
+unsigned const long playerMoveSpeed = 100;      //time between each player moves //LO, MD, HI = 500, 300, 100
+const int mazeGenerateSpeed = 10;               //LO, MD, HI = 80, 40, 10
 unsigned long mazeSolvedScreenTimeout = 2000;   //time that the solved maze stays on screen
 
 //State Machine for Display
@@ -142,12 +143,12 @@ void settings(){
 
 //Draw the maze
 void maze(){
-  //create player
-  static Player player1;
+  //create player as color Orange
+  static Player player1('O');
   if (currentState == MAZESCREEN) {
     if(!mazeScreenOpenLast || (mazeSolved && (millis() - mazeSolvedTime > mazeSolvedScreenTimeout))){
       //draw the maze initially
-      generateMaze();
+      generateMaze(mazeGenerateSpeed);
       builtMaze = mazeGetter();
       mazeSolved = false;
       playerSetupComplete  = false;
@@ -168,7 +169,7 @@ void maze(){
         lastPlayerMoveTime = millis();
         // Player code calls go here
         // Update the solver path with one recursive step.
-        player1.calculateMove(builtMaze, 'O', 'x');
+        player1.calculateMove(builtMaze);
         // Check if we've reached the end (for example, if the last cell is 'E')
         if (!player1.getPositions().empty() && builtMaze[player1.getPositions().back().first][player1.getPositions().back().second] == 'E') {
             mazeSolvedTime = millis();

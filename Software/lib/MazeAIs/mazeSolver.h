@@ -7,8 +7,8 @@ using namespace std;
 //Player class
 class Player {
 public:
-    // Default constructor
-    Player();
+    // Default constructor: OR = Orange, BL = Blue | speedMS LO, MD, HI = 
+    Player(const char& color = 'O');
 
     // Add a new position to the tracker
     void addPosition(int row, int col);
@@ -17,7 +17,7 @@ public:
     vector<pair<int, int>>& getPositions();
 
     //calculate the player's move
-    void calculateMove(vector<vector<char>>& maze, const char playerChar, const char playerPathChar);
+    void calculateMove(vector<vector<char>>& maze);
     
     // Clear all stored positions
     void clearPositions();

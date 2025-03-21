@@ -6,9 +6,24 @@
 #include <algorithm> // for std::shuffle
 using namespace std;
 
+//Player config vars
+char playerChar;
+char playerPathChar;
+char playerBacktrackChar;
+
+//working vars
+
 // Constructor
-Player::Player() {
-    // Initialize if needed
+Player::Player(const char& color) {
+    if (color == 'B') {
+        playerChar = 'B';
+        playerPathChar = 'Z';       //cap Z
+        playerBacktrackChar = 'z';  //lowercase z
+    } else {
+        playerChar = 'O';
+        playerPathChar = 'X';       //cap X
+        playerBacktrackChar = 'x';  //lowercase x
+    }
 }
 
 // Add a new position
@@ -30,10 +45,7 @@ void Player::clearPositions() {
 /// @brief Recursively attempts to move through the maze one step.
 /// @brief This algorithm relies on the princible that in prims algorithm, there is exactly ONE way to get to any part of the maze, given any4 single starting point.
 /// @param maze The maze (modified as cells are visited).
-/// @param position The current path (a vector of cell coordinates).
-/// @param playerChar The character representing the player.
-/// @param playerPathChar The character representing the path the player has taken.
-void Player::calculateMove(vector<vector<char>>& maze, const char playerChar, const char playerPathChar) {
+void Player::calculateMove(vector<vector<char>>& maze) {
     //Serial.println("=========================================");
     // Ensure there is a valid starting position
     if (playerPositions.empty()) {
@@ -98,13 +110,8 @@ void Player::calculateMove(vector<vector<char>>& maze, const char playerChar, co
         //Serial.println(); // Move to a new line after printing all elements
         //printDebugInfo("Moving to", newRow, newCol);
 
-        // Mark current position with trail if not start or end
-        //TODO Remove?
-        if (maze[currentRow][currentCol] != 'S' && maze[currentRow][currentCol] != 'E') {
-            maze[currentRow][currentCol] = playerPathChar;
-            drawElement(currentRow, currentCol, playerPathChar);
-            //printDebugInfo("Marked trail at current position");
-        }
+        //draw path
+        drawElement(currentRow, currentCol, playerPathChar);
         // Update the wall and new position
         drawElement(wallRow, wallCol, playerPathChar);
         playerPositions.push_back({newRow, newCol});
@@ -168,6 +175,13 @@ bool Player::isValidMove(int newRow, int newCol, int wallRow, int wallCol, const
     }
     if (mazeCheck[wallRow][wallCol] != ',') {
         return false;
+    }
+    // Check if the new position is the previous position to prevent reversing
+    if (playerPositions.size() > 1) {
+        std::pair<int, int> prevPosition = playerPositions[playerPositions.size() - 2];
+        if (newRow == prevPosition.first && newCol == prevPosition.second) {
+            return false;
+        }
     }
     return true;
 }

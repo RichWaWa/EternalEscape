@@ -40,7 +40,7 @@ const vector<vector<char>>  mazeTemplate = {
 };//end mazeTemplate
 
 //maze generator functions
-void generateMaze();        //Generate the maze
+void generateMaze(const int speedMS = 10);        //Generate the maze at speed "speedMS"
 vector<vector<char>> copyMazeTemplate();
 vector<vector<char>> mazeGetter();
 vector<pair<int, int>> getStartPositions();
