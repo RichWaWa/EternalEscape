@@ -7,7 +7,7 @@ using namespace std;
 //Player class
 class Player {
 public:
-    // Default constructor: OR = Orange, BL = Blue | speedMS LO, MD, HI = 
+    // Default constructor: OR = Orange, BL = Blue
     Player(const char& color = 'O');
 
     // Add a new position to the tracker
