@@ -178,8 +178,6 @@ void maze(){
         return;
       }
     }//end mazeScreenOpenLast else
-
-
   }else{
     mazeScreenOpenLast = false; //maze screen closed
   }//END Display Screen updates
