@@ -108,6 +108,7 @@ void generateMaze() {
 
     // Ensure 'E' remains unchanged
     drawElement(endRow, endCol, 'E'); // Checkered finish
+    maze[endRow][endCol] = 'E';
     Serial.println("Maze Drawn");
 }
 

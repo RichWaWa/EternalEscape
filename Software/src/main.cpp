@@ -16,14 +16,17 @@ int16_t x, y, z;
 
 //Misc Global variables
 unsigned long lastPlayerMoveTime = 0;
+unsigned long mazeSolvedTime = 0;
+
 bool mazeSolved = false;
 vector<pair<int, int>> tempPosition = {{0, 0}};
 vector<vector<char>> builtMaze;
 bool playerSetupComplete = false;
 //Misc Settings TODO: Move these
-unsigned const long playerMoveSpeed = 500;
+unsigned const long playerMoveSpeed = 500;      //time between each player moves
 static const int holdToggleValue = 3000;        //value for how long you need to hold on the display to access the settings.
 static const int debounceDelay = 500;           //delay for the touch debounce.
+unsigned long mazeSolvedScreenTimeout = 2000;   //time that the solved maze stays on screen
 
 //State Machine for Display
 enum State { MAZESCREEN, SETTINGS };
@@ -54,7 +57,7 @@ void setup() {
   srand(time(0));  // Seed random number generator
   // Initialize the TFT display
   initScreen();
-  waitForSerial();  //debug statement 
+  //waitForSerial();  //debug statement 
 
   //Get MAC address
   macAddr = getMACAddress();
@@ -142,9 +145,8 @@ void maze(){
   //create player
   static Player player1;
   if (currentState == MAZESCREEN) {
-    if(!mazeScreenOpenLast){
+    if(!mazeScreenOpenLast || (mazeSolved && (millis() - mazeSolvedTime > mazeSolvedScreenTimeout))){
       //draw the maze initially
-      //drawFillScreen(0xFFFF); //Fill screen with white
       generateMaze();
       builtMaze = mazeGetter();
       mazeSolved = false;
@@ -162,20 +164,22 @@ void maze(){
         Serial.println("Player Setup Complete");
       }
       //update the maze as the player moves here.
-      if (millis() - lastPlayerMoveTime > playerMoveSpeed) {
+      if ((millis() - lastPlayerMoveTime > playerMoveSpeed) && !mazeSolved) {
         lastPlayerMoveTime = millis();
         // Player code calls go here
         // Update the solver path with one recursive step.
         player1.calculateMove(builtMaze, 'O', 'x');
         // Check if we've reached the end (for example, if the last cell is 'E')
-        if (!player1.getPositions().empty() && mazeGetter()[player1.getPositions().back().first][player1.getPositions().back().second] == 'E') {
-            mazeSolved = true;
+        if (!player1.getPositions().empty() && builtMaze[player1.getPositions().back().first][player1.getPositions().back().second] == 'E') {
+            mazeSolvedTime = millis();
             Serial.println("Maze Solved!");
+            mazeSolved = true;
         }
-        Serial.println("The player shall move now!");
         return;
       }
-    }//end open last else
+    }//end mazeScreenOpenLast else
+
+
   }else{
     mazeScreenOpenLast = false; //maze screen closed
   }//END Display Screen updates

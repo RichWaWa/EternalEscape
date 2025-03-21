@@ -34,7 +34,7 @@ void Player::clearPositions() {
 /// @param playerChar The character representing the player.
 /// @param playerPathChar The character representing the path the player has taken.
 void Player::calculateMove(vector<vector<char>>& maze, const char playerChar, const char playerPathChar) {
-    Serial.println("=========================================");
+    //Serial.println("=========================================");
     // Ensure there is a valid starting position
     if (playerPositions.empty()) {
         printDebugInfo("Error: Player position vector is empty!");
@@ -42,11 +42,10 @@ void Player::calculateMove(vector<vector<char>>& maze, const char playerChar, co
     }
     //Check if NOT first run
     if(!directionsList.empty()){
-        //Need to somehow determine if we are backtracking here
         //See if the length of the paths list is 1 shorter than the Directions list. If it is, then we likely backtracked.
         //If this is true, then we know we have backtracked.
         if(directionsList.size() > playerPositions.size()){
-            Serial.println("Vector lists unequal. We must of backtracked.");
+            //Serial.println("Vector lists unequal. We must of backtracked.");
             directionsList.pop_back(); 
         }else{
             //New move, shuffle and push back.
@@ -60,7 +59,7 @@ void Player::calculateMove(vector<vector<char>>& maze, const char playerChar, co
     // Get current player position
     int currentRow = playerPositions.back().first;
     int currentCol = playerPositions.back().second;
-    printDebugInfo("Current Position", currentRow, currentCol);
+    //printDebugInfo("Current Position", currentRow, currentCol);
 
     // Attempt all directions in the randomized order. Dont change the length to 5!!! Leave at 4 to avoid infinite looping.
     for (int i = 0; i < 4; i++) {
@@ -70,12 +69,12 @@ void Player::calculateMove(vector<vector<char>>& maze, const char playerChar, co
             //if we reached the end of the direction list, break out
             break;
         }
-        Serial.print("Rotated Directions: ");
-        for (int N : directionsList.back()) {
-            Serial.print(N);
-            Serial.print(" ");
-        }
-        Serial.println(); // Move to a new line after printing all elements
+        //Serial.print("Rotated Directions: ");
+        //for (int N : directionsList.back()) {
+        //    Serial.print(N);
+        //    Serial.print(" ");
+        //}
+        //Serial.println(); // Move to a new line after printing all elements
         //Serial.println("Moving in direction" + dir);
         int newRow = currentRow + pathDirections[dir].first;
         int newCol = currentCol + pathDirections[dir].second;
@@ -90,20 +89,21 @@ void Player::calculateMove(vector<vector<char>>& maze, const char playerChar, co
         }
         //idea of this is to rotate the directions vector so that the first position is a direction we havnt tried yet.
         rotate(directionsList.back().begin(), directionsList.back().begin() + (i+1), directionsList.back().end());
-        Serial.printf("Rotating: %d\n", (i + 1));
-        Serial.print("Rotated Directions: ");
-        for (int N : directionsList.back()) {
-            Serial.print(N);
-            Serial.print(" ");
-        }
-        Serial.println(); // Move to a new line after printing all elements
-        printDebugInfo("Moving to", newRow, newCol);
+        //Serial.printf("Rotating: %d\n", (i + 1));
+        //Serial.print("Rotated Directions: ");
+        //for (int N : directionsList.back()) {
+        //    Serial.print(N);
+        //    Serial.print(" ");
+        //}
+        //Serial.println(); // Move to a new line after printing all elements
+        //printDebugInfo("Moving to", newRow, newCol);
 
         // Mark current position with trail if not start or end
+        //TODO Remove?
         if (maze[currentRow][currentCol] != 'S' && maze[currentRow][currentCol] != 'E') {
             maze[currentRow][currentCol] = playerPathChar;
             drawElement(currentRow, currentCol, playerPathChar);
-            printDebugInfo("Marked trail at current position");
+            //printDebugInfo("Marked trail at current position");
         }
         // Update the wall and new position
         drawElement(wallRow, wallCol, playerPathChar);
@@ -115,7 +115,7 @@ void Player::calculateMove(vector<vector<char>>& maze, const char playerChar, co
 
     // No moves possible, backtracking
     if (playerPositions.size() > 1) {
-        printDebugInfo("No valid moves, backtracking...");
+        //printDebugInfo("No valid moves, backtracking...");
         playerPositions.pop_back();
         //NOTE: We dont want to pop_back the directions vector, because we use it to determine if we backtracked or not
         drawElement(currentRow, currentCol, playerPathChar);
@@ -138,9 +138,8 @@ vector<int> Player::shuffleDirections(){
     //Serial.println(); // Move to a new line after printing all elements
 
     //We add 9 at the end of the list to signify when we have tried every direction.
-    //This prevents it from getting stuck. 
+    //This prevents it from getting stuck. Ex output {0, 1, 2, 3, 9}; 
     directions.push_back(9);    
-    directions = {0, 1, 2, 3, 9}; 
     return directions;
 }
 
@@ -158,8 +157,9 @@ bool Player::isValidMove(int newRow, int newCol, int wallRow, int wallCol, const
     if (newRow <= 0 || newRow >= mazeCheck.size() - 1 || newCol <= 0 || newCol >= mazeCheck[0].size() - 1) {
         return false;
     }
-    // Now it's safe to access maze[newRow][newCol]. Check if it's a valid path.
-    if (mazeCheck[newRow][newCol] != '0') {
+    // Now it's safe to access maze[newRow][newCol].
+    //Check if the path is valid or is the end.
+    if (mazeCheck[newRow][newCol] != '0' && mazeCheck[newRow][newCol] != 'E') {
         return false;
     }
     // Check if the wall is a valid passage
