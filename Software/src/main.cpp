@@ -28,6 +28,7 @@ static const int debounceDelay = 500;           //delay for the touch debounce.
 unsigned const long playerMoveSpeed = 100;      //time between each player moves //LO, MD, HI = 500, 300, 100
 const int mazeGenerateSpeed = 10;               //LO, MD, HI = 80, 40, 10
 unsigned long mazeSolvedScreenTimeout = 2000;   //time that the solved maze stays on screen
+bool enablePlayer2 = false;                      // Variable to control whether player2 is created
 
 //State Machine for Display
 enum State { MAZESCREEN, SETTINGS };
@@ -143,8 +144,14 @@ void settings(){
 
 //Draw the maze
 void maze(){
-  //create player as color Orange
+  //create player1 as color Orange
   static Player player1('O');
+  // Conditionally create player2 as color Blue
+  static Player* player2 = nullptr;
+  if (enablePlayer2 && !player2) {
+    player2 = new Player('B');
+  }
+  //Start main programloop for the maze screen state
   if (currentState == MAZESCREEN) {
     if(!mazeScreenOpenLast || (mazeSolved && (millis() - mazeSolvedTime > mazeSolvedScreenTimeout))){
       //draw the maze initially
@@ -161,6 +168,11 @@ void maze(){
         // Find Start and store in player positions
         player1.clearPositions();  //reset the path
         player1.addPosition(getStartPositions()[0].first, getStartPositions()[0].second);
+        // If player2 exists, set it up
+        if (player2) {
+          player2->clearPositions();
+          player2->addPosition(getStartPositions()[1].first, getStartPositions()[1].second);
+        }
         playerSetupComplete = true;
         Serial.println("Player Setup Complete");
       }
@@ -170,11 +182,16 @@ void maze(){
         // Player code calls go here
         // Update the solver path with one recursive step.
         player1.calculateMove(builtMaze);
-        // Check if we've reached the end (for example, if the last cell is 'E')
-        if (!player1.getPositions().empty() && builtMaze[player1.getPositions().back().first][player1.getPositions().back().second] == 'E') {
-            mazeSolvedTime = millis();
-            Serial.println("Maze Solved!");
-            mazeSolved = true;
+        // Player 2 moves if it exists
+        if (player2) {
+          player2->calculateMove(builtMaze);
+        }
+        // Check if player1 or player2 has solved the maze (for example, if the last cell is 'E')
+        if ((!player1.getPositions().empty() && builtMaze[player1.getPositions().back().first][player1.getPositions().back().second] == 'E') ||
+            (player2 && !player2->getPositions().empty() && builtMaze[player2->getPositions().back().first][player2->getPositions().back().second] == 'E')) {
+          mazeSolvedTime = millis();
+          Serial.println("Maze Solved!");
+          mazeSolved = true;
         }
         return;
       }

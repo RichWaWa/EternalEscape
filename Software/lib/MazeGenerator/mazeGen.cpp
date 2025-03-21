@@ -16,7 +16,7 @@ vector<vector<char>>  maze;
 const vector<pair<int, int>> directions = {{-2, 0}, {2, 0}, {0, -2}, {0, 2}};
 
 //start and end global variables
-vector<pair<int, int>> startPositions = {{0, 0}};
+vector<pair<int, int>> startPositions = {{0, 0}, {0, 0}};
 int endRow = 0, endCol = 0;
 
 // Prim's Algorithm to generate the maze
@@ -153,18 +153,21 @@ void generateStartAndEnd(vector<vector<char>>& maze) {
 
     srand(time(0)); // Seed for random number generation
 
-    // Randomly select start
-    bool startPlaced = false;
-    while (!startPlaced) {
-        int row = 1 + rand() % (rows - 2); // rows 1 to rows-2
-        int col = 1 + rand() % (cols - 2); // cols 1 to cols-2
-        if (maze[row][col] == '.') {
-            //save start pos to global vars
-            startPositions[0].first  = row;
-            startPositions[0].second = col;
-            // Mark new cell as part of the maze
-            maze[startPositions[0].first][startPositions[0].second] = '0';
-            startPlaced = true;
+    // Randomly select starts for P1 and P2
+    for (size_t i = 0; i < 2; i++)
+    {
+        bool startPlaced = false;
+        while (!startPlaced) {
+            int row = 1 + rand() % (rows - 2); // rows 1 to rows-2
+            int col = 1 + rand() % (cols - 2); // cols 1 to cols-2
+            // Check if the spot is empty and not already taken
+            if (maze[row][col] == '.' && 
+                (i == 0 || (row != startPositions[0].first || col != startPositions[0].second))) {
+                // Save start pos to global vars
+                startPositions[i].first = row;
+                startPositions[i].second = col;
+                startPlaced = true;
+            }
         }
     }
 
@@ -173,8 +176,11 @@ void generateStartAndEnd(vector<vector<char>>& maze) {
     while (!endPlaced) {
         int row = 1 + rand() % (rows - 2);
         int col = 1 + rand() % (cols - 2);
-        if (maze[row][col] == '.' && (row != startPositions[0].first || col != startPositions[0].second)) {
-            //save end pos to global vars
+        // Check if the end position is on a path and not overlapping with either starting position
+        if (maze[row][col] == '.' &&
+            (row != startPositions[0].first || col != startPositions[0].second) &&
+            (row != startPositions[1].first || col != startPositions[1].second)) {
+            // Save end pos to global vars
             endRow = row;
             endCol = col;
             endPlaced = true;
