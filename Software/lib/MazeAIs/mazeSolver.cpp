@@ -121,15 +121,31 @@ void Player::calculateMove(vector<vector<char>>& maze) {
     }
 
     // No moves possible, backtracking
-    if (playerPositions.size() > 1) {
-        //printDebugInfo("No valid moves, backtracking...");
-        playerPositions.pop_back();
-        //NOTE: We dont want to pop_back the directions vector, because we use it to determine if we backtracked or not
-        drawElement(currentRow, currentCol, playerPathChar);
-        drawElement(playerPositions.back().first, playerPositions.back().second, playerChar);
-    } else {
-        printDebugInfo("Player is stuck with no way to backtrack.");
-    }
+if (playerPositions.size() > 1) {
+    //printDebugInfo("No valid moves, backtracking...");
+    int currentRow = playerPositions.back().first;
+    int currentCol = playerPositions.back().second;
+
+    playerPositions.pop_back();
+
+    int backtrackRow = playerPositions.back().first;
+    int backtrackCol = playerPositions.back().second;
+
+    // Draw backtrack on the current position
+    drawElement(currentRow, currentCol, playerBacktrackChar);
+
+    // Calculate the wall position between current and backtrack positions
+    int wallRow = (currentRow + backtrackRow) / 2;
+    int wallCol = (currentCol + backtrackCol) / 2;
+
+    // Color the wall with the backtrack color
+    drawElement(wallRow, wallCol, playerBacktrackChar);
+
+    // Color the backtracked-to position with the player color
+    drawElement(backtrackRow, backtrackCol, playerChar);
+} else {
+    printDebugInfo("Player is stuck with no way to backtrack.");
+}
 }
 
 /// @brief shuffles the movement directions to make player movement more unique
