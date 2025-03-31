@@ -6,11 +6,6 @@
 #include <algorithm> // for std::shuffle
 using namespace std;
 
-//Player config vars
-char playerChar;
-char playerPathChar;
-char playerBacktrackChar;
-
 //working vars
 
 // Constructor

@@ -186,7 +186,7 @@ void maze(){
         if (player2) {
           player2->calculateMove(builtMaze);
         }
-        // Check if player1 or player2 has solved the maze (for example, if the last cell is 'E')
+        // Check if player1 or player2 has solved the maze (if the last cell is 'E')
         if ((!player1.getPositions().empty() && builtMaze[player1.getPositions().back().first][player1.getPositions().back().second] == 'E') ||
             (player2 && !player2->getPositions().empty() && builtMaze[player2->getPositions().back().first][player2->getPositions().back().second] == 'E')) {
           mazeSolvedTime = millis();

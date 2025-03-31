@@ -37,6 +37,10 @@ private:
     bool isValidMove(int newRow, int newCol, int wallRow, int wallCol, const vector<vector<char>>& maze);
     //Function for printing debug info. Basically formats the coords better
     void printDebugInfo(const char* message, int row = -1, int col = -1);
+    //Player config vars
+    char playerChar;
+    char playerPathChar;
+    char playerBacktrackChar;
 };
 #endif
 
