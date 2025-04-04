@@ -26,8 +26,8 @@ static const int debounceDelay = 500;           //delay for the touch debounce.
 
 //Misc Settings TODO: Move these to Settings
 unsigned const long playerMoveSpeed = 100;      //time between each player moves //LO, MD, HI = 500, 300, 100
-const int mazeGenerateSpeed = 10;               //LO, MD, HI = 80, 40, 10
-unsigned long mazeSolvedScreenTimeout = 2000;   //time that the solved maze stays on screen
+const int mazeGenerateSpeed = 10;               //speed the maze generates at //LO, MD, HI = 80, 40, 10
+unsigned long mazeSolvedScreenTimeout = 2000;   //time that the solved maze stays on screen //LO, MD, HI = 1000, 2000, 4000
 bool enablePlayer2 = true;                      // Variable to control whether player2 is created
 
 //State Machine for Display
