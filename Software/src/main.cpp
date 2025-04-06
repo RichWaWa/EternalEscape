@@ -1,5 +1,4 @@
 #include <Adafruit_ILI9341.h> // Include the Adafruit ILI9341 library
-#include <Adafruit_NeoPixel.h> // Include the NeoPixel library
 #include "TouchScreen.h" // Include the Adafruit Touchscreen library
 #include "screen.h"     //screen class
 #include "networking.h" //Networking class
@@ -25,9 +24,9 @@ static const int holdToggleValue = 3000;        //value for how long you need to
 static const int debounceDelay = 500;           //delay for the touch debounce.
 
 //Misc Settings TODO: Move these to Settings
-unsigned const long playerMoveSpeed = 100;      //time between each player moves //LO, MD, HI = 500, 300, 100
+unsigned const int playerMoveSpeed = 100;       //time between each player moves //LO, MD, HI = 500, 300, 100
 const int mazeGenerateSpeed = 10;               //speed the maze generates at //LO, MD, HI = 80, 40, 10
-unsigned long mazeSolvedScreenTimeout = 2000;   //time that the solved maze stays on screen //LO, MD, HI = 1000, 2000, 4000
+unsigned int mazeSolvedScreenTimeout = 2000;    //time that the solved maze stays on screen //1, 2, 4 = 1000, 2000, 4000
 bool enablePlayer2 = true;                      // Variable to control whether player2 is created
 
 //State Machine for Display

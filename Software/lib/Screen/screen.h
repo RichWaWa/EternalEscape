@@ -63,6 +63,7 @@ void drawElement(int rowA, int colA, char cellType);   //draw the cell element
 void loadingScreen();
 
 // Helper functions
+void drawSimpleButton(String label, String level, int btnX, int btnY);
 void drawText(const char* text, int16_t x, int16_t y, uint16_t color);
 void drawFillRectangle(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
 void drawFillScreen(uint16_t color);
@@ -70,7 +71,7 @@ void drawBorderedRectangle(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t 
 void drawTextCentered(const char* text, int16_t centerX, int16_t centerY, uint16_t color);
 void drawFinishSquare(int16_t x, int16_t y, int16_t cellSize);
 int loadBrightnessFromSettings();
-void toggleBrightness();
+void toggleSettingLevel(String& currentSettingLevel, int& currentSettingValue, const int settingLevelValues[3], const String levels[3]);
 String getBrightnessLevel();
 
 #endif // SCREEN_H
