@@ -24,10 +24,10 @@ static const int holdToggleValue = 3000;        //value for how long you need to
 static const int debounceDelay = 500;           //delay for the touch debounce.
 
 //Misc Settings TODO: Move these to Settings
-unsigned const int playerMoveSpeed = 100;       //time between each player moves //LO, MD, HI = 500, 300, 100
-const int mazeGenerateSpeed = 10;               //speed the maze generates at //LO, MD, HI = 80, 40, 10
-unsigned int mazeSolvedScreenTimeout = 2000;    //time that the solved maze stays on screen //1, 2, 4 = 1000, 2000, 4000
-bool enablePlayer2 = true;                      // Variable to control whether player2 is created
+//unsigned const int playerMoveSpeed = 100;       //time between each player moves //LO, MD, HI = 500, 300, 100
+//const int mazeGenerateSpeed = 10;               //speed the maze generates at //LO, MD, HI = 80, 40, 10
+//unsigned int mazeSolvedScreenTimeout = 2000;    //time that the solved maze stays on screen //1, 2, 4 = 1000, 2000, 4000
+//bool enablePlayer2 = true;                      // Variable to control whether player2 is created
 
 //State Machine for Display
 enum State { MAZESCREEN, SETTINGS };
@@ -147,14 +147,14 @@ void maze(){
   static Player player1('O');
   // Conditionally create player2 as color Blue
   static Player* player2 = nullptr;
-  if (enablePlayer2 && !player2) {
+  if (player2Toggle && !player2) {
     player2 = new Player('B');
   }
   //Start main programloop for the maze screen state
   if (currentState == MAZESCREEN) {
-    if(!mazeScreenOpenLast || (mazeSolved && (millis() - mazeSolvedTime > mazeSolvedScreenTimeout))){
+    if(!mazeScreenOpenLast || (mazeSolved && (millis() - mazeSolvedTime > victoryTimeout))){
       //draw the maze initially
-      generateMaze(mazeGenerateSpeed);
+      generateMaze(mazeSpeed);
       builtMaze = mazeGetter();
       mazeSolved = false;
       playerSetupComplete  = false;
@@ -176,7 +176,7 @@ void maze(){
         Serial.println("Player Setup Complete");
       }
       //update the maze as the player moves here.
-      if ((millis() - lastPlayerMoveTime > playerMoveSpeed) && !mazeSolved) {
+      if ((millis() - lastPlayerMoveTime > playerSpeed) && !mazeSolved) {
         lastPlayerMoveTime = millis();
         // Player code calls go here
         // Update the solver path with one recursive step.

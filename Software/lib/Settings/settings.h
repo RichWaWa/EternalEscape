@@ -2,17 +2,33 @@
 #define EEPROM_UTILS_H
 
 #include <Preferences.h> // Include the Preferences library
+#include <Arduino.h>
+#include <String.h>
 
-// Initialize the preferences storage
+// Initialize preferences
 void initializePreferences();
 
-// Save the brightness level to EEPROM
-void saveBrightness(String brightness);
+// Brightness functions
+void saveBrightness(int brightness);
+int loadBrightness();
 
-// Load the brightness level from EEPROM
-String loadBrightness();
+// Player Speed functions
+void savePlayerSpeed(int speed);
+int loadPlayerSpeed();
 
-// Clear all stored settings (optional, for reset purposes)
+// Maze Speed functions
+void saveMazeSpeed(int speed);
+int loadMazeSpeed();
+
+// Victory Timeout functions
+void saveVictoryTimeout(int timeout);
+int loadVictoryTimeout();
+
+// Player 2 toggle functions
+void savePlayer2(bool enabled);
+bool loadPlayer2();
+
+// Clear all preferences
 void clearPreferences();
 
-#endif // EEPROM_UTILS_H
+#endif

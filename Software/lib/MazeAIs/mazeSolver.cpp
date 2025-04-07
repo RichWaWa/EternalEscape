@@ -170,7 +170,7 @@ vector<int> Player::shuffleDirections(){
 /// @return True if the move is valid.
 bool Player::isValidMove(int newRow, int newCol, int wallRow, int wallCol, const vector<vector<char>>& mazeCheck) {
     // Check if the new position is within bounds and a valid path
-    Serial.println("Validating Move");
+    //Serial.println("Validating Move");
     // First, check if the row and column are within valid bounds.
     if (newRow <= 0 || newRow >= mazeCheck.size() - 1 || newCol <= 0 || newCol >= mazeCheck[0].size() - 1) {
         return false;

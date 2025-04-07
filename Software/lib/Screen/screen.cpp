@@ -4,13 +4,18 @@
 // Global variables for TFT and touchscreen
 Adafruit_ILI9341 tft(TFT_CS, TFT_DC, TFT_RST);  // Initialize tft with required pin values
 TouchScreen ts(TS_XP, TS_YP, TS_XM, TS_YM, TS_RES);  // Initialize ts with required pin values and resistance
+//Global Variables
+int brightnessPWM = 255;                //Default brightness PWM
+int playerSpeed = 100; 
+int mazeSpeed = 10; 
+int victoryTimeout = 4000; 
+bool player2Toggle = false;                          //default off
 
 //Brightness button Variables
 const int16_t btnBrightnessX = 150;     // X-coordinate of the rectangle
 const int16_t btnBrightnessY = 110;     // Y-coordinate of the rectangle
 String brightnessLevel = "HI";          // Default brightness level
 String brightnessLevelLast = "";  
-int brightnessPWM = 255;                //Default brightness PWM
 
 //speed the players move
 //time between each player moves //LO, MD, HI = 500, 300, 100
@@ -18,15 +23,13 @@ const int16_t btnPlayerSpeedX = 150;
 const int16_t btnPlayerSpeedY = 135;
 String playerSpeedLevel = "HI";              // Default player speed
 String playerSpeedLevelLast = "";            // Last player speed value
-int playerSpeed = 100; 
 
 //speed the maze completes
 //speed the maze generates at //LO, MD, HI = 80, 40, 10
 const int16_t btnMazeSpeedX = 150;
 const int16_t btnMazeSpeedY = 160;
 String mazeSpeedLevel = "HI";                // Default maze speed
-String mazeSpeedLevelLast = "";              // Last maze speed value
-int mazeSpeed = 10;  
+String mazeSpeedLevelLast = "";              // Last maze speed value 
 
 //maze complete timeout (how long the finished maze stays on screen)
 //time that the solved maze stays on screen //1, 2, 4 = 1000, 2000, 4000
@@ -34,7 +37,6 @@ const int16_t btnTimeoutX = 150;
 const int16_t btnTimeoutY = 185;
 String victoryTimeoutLevel = "4";             // Default victory timeout
 String victoryTimeoutLevelLast = "";          // Last victory timeout value
-int victoryTimeout = 4000; 
 
 //toggles player 2
 // Variable to control whether player2 is created
@@ -42,7 +44,6 @@ const int16_t btnPlayer2X = 150;
 const int16_t btnPlayer2Y = 210;
 String player2Level = "OFF";                    // Default Player 2 status
 String player2LevelLast = "";                   // Last Player 2 status value
-bool player2Toggle = false;                     //default off
 
 //Button Dimentions
 const int16_t btnWidth = 60;  // Width of the rectangle
@@ -60,10 +61,15 @@ void initScreen() {
     tft.fillScreen(ILI9341_BLACK);  
     pinMode(TFT_LITE, OUTPUT); //set the PWM output for the backlight
     //need to load the brightness from the settings
-    brightnessPWM = loadBrightnessFromSettings();
+    brightnessPWM = loadBrightness();
     analogWrite(TFT_LITE, brightnessPWM);   //set brightness level
-    loadingScreen();    //show the loading screen
 
+    playerSpeed = loadPlayerSpeed();
+    mazeSpeed = loadMazeSpeed();
+    victoryTimeout = loadVictoryTimeout();
+    player2Toggle = loadPlayer2();
+
+    loadingScreen();    //show the loading screen 
 }
 
 // Draw the settings screen initially
@@ -88,7 +94,7 @@ void drawSettingsScreen(const String& macAddress, bool wifiStatus) {
 
     // Draw brightness toggle
     drawSimpleButton("Brightness:", brightnessLevel, btnBrightnessX, btnBrightnessY);
-    brightnessLevelLast = brightnessLevel;
+    //brightnessLevelLast = brightnessLevel;
     //draw player speed toggle
     drawSimpleButton("PlayerSpeed:", playerSpeedLevel, btnPlayerSpeedX, btnPlayerSpeedY);
     playerSpeedLevelLast = playerSpeedLevel;
@@ -96,7 +102,7 @@ void drawSettingsScreen(const String& macAddress, bool wifiStatus) {
     drawSimpleButton("MazeSpeed:", mazeSpeedLevel, btnMazeSpeedX, btnMazeSpeedY);
     mazeSpeedLevelLast = mazeSpeedLevel;
     //draw victory timeout toggle
-    drawSimpleButton("Victory Timeout:", victoryTimeoutLevel, btnTimeoutX, btnTimeoutY);
+    drawSimpleButton("VctryTime:", victoryTimeoutLevel, btnTimeoutX, btnTimeoutY);
     victoryTimeoutLevelLast = victoryTimeoutLevel;
     //draw player2 toggle
     drawSimpleButton("Player2:", player2Level, btnPlayer2X, btnPlayer2Y);
@@ -121,11 +127,13 @@ void updateSettingsScreen(int16_t x, int16_t y, int16_t z ,bool wifiStatus) {
         wifiStatusLast = wifiStatus;
     }
 
-    // Update brightness level only if it has changed
-    checkBrightnessButtonTouch(x, y, z);
-    if (brightnessLevel != brightnessLevelLast) {
-        brightnessLevelLast = brightnessLevel;
-    }
+    // Update settings if they have changed
+    checkButtonTouch(x, y, z, btnBrightnessX, btnBrightnessY, "Brightness", brightnessLevel, toggleBrightness);
+    checkButtonTouch(x, y, z, btnPlayerSpeedX, btnPlayerSpeedY, "PlayerSpeed", playerSpeedLevel, togglePlayerSpeed);
+    checkButtonTouch(x, y, z, btnMazeSpeedX, btnMazeSpeedY, "MazeSpeed", mazeSpeedLevel, toggleMazeSpeed);
+    checkButtonTouch(x, y, z, btnTimeoutX, btnTimeoutY, "Timeout", victoryTimeoutLevel, toggleVictoryTimeout);
+    checkButtonTouch(x, y, z, btnPlayer2X, btnPlayer2Y, "Player2", player2Level, togglePlayer2);
+
 }
 
 // Get touch points
@@ -156,33 +164,27 @@ void getTouchPoints(int16_t& x, int16_t& y, int16_t& z) {
     //Serial.println(z);
 }
 
-// Check if the brightness button has been toggled
-void checkBrightnessButtonTouch(int16_t x, int16_t y, int16_t z) {
-    // Check for valid touch input
+//check if a button was toggled
+void checkButtonTouch(int16_t x, int16_t y, int16_t z, int16_t btnX, int16_t btnY, const String& label, String& settingLevel, void (*onTouchCallback)()) {
     if (z > MINPRESSURE && z < MAXPRESSURE) {
-        // Check if the touch is within the rectangle bounds
-        if (x >= btnBrightnessX && x <= (btnBrightnessX + btnWidth) &&
-            y >= btnBrightnessY && y <= (btnBrightnessY + btnHeight)) {
-            // Check for debounce
+        if (x >= btnX && x <= (btnX + btnWidth) &&
+            y >= btnY && y <= (btnY + btnHeight)) {
+
             unsigned long currentTime = millis();
             if (currentTime - lastTouchTime > debounceDelay) {
-                // Toggle brightness level
-                toggleBrightness(); // toggle brightness
+                // Call the provided toggle/update function
+                if (onTouchCallback != nullptr) {
+                    onTouchCallback();
+                }
 
-                // Update the brightness level on the screen
-                drawFillRectangle(btnBrightnessX, btnBrightnessY, btnWidth, btnHeight, ILI9341_WHITE); // Redraw rectangle
-                drawTextCentered(brightnessLevel.c_str(), btnBrightnessX + (btnWidth / 2), btnBrightnessY + (btnHeight / 2), ILI9341_BLACK);
+                // Update the button appearance
+                drawFillRectangle(btnX, btnY, btnWidth, btnHeight, ILI9341_WHITE);
+                drawTextCentered(settingLevel.c_str(), btnX + (btnWidth / 2), btnY + (btnHeight / 2), ILI9341_BLACK);
 
-                // Update debounce timer
                 lastTouchTime = currentTime;
             }
         }
     }
-}
-
-// Draw Strobe Screen
-void drawStrobeScreen(uint16_t color) {
-    tft.fillScreen(color);
 }
 
 void loadingScreen() {
@@ -201,9 +203,61 @@ void loadingScreen() {
     drawTextCentered("Loading...", tft.width() / 2, tft.height() / 2 + 20, ILI9341_DARKGREY);
 }
 
+void toggleBrightness() {
+    // Change brightness level
+    const int levelValues[3] = {85, 128, 255};
+    const String levelsText[3] = {"LO", "MD", "HI"};
+    Serial.println("Hey! I wanna change the brightness now");
+    toggleSettingLevel(brightnessLevel, brightnessLevelLast, brightnessPWM, levelValues, levelsText, 3);
+    //if (brightnessLevel != brightnessLevelLast) {
+    //    brightnessLevelLast = brightnessLevel;
+    //
+    //}
+    Serial.println(brightnessLevel);    //Debug
+    saveBrightness(brightnessPWM);    //save to settings
+    analogWrite(TFT_LITE, brightnessPWM);   //set brightness level
+} 
+
+void togglePlayerSpeed() {
+    const int levelValues[3] = {500, 300, 100};  // Time between player moves
+    const String levelsText[3] = {"LO", "MD", "HI"};
+    Serial.println("Toggling Player Speed");
+    toggleSettingLevel(playerSpeedLevel, playerSpeedLevelLast, playerSpeed, levelValues, levelsText, 3);
+    Serial.println(playerSpeedLevel);  // Debug
+    savePlayerSpeed(playerSpeed);
+}
+
+void toggleMazeSpeed() {
+    const int levelValues[3] = {80, 40, 10};  // Maze generation delay
+    const String levelsText[3] = {"LO", "MD", "HI"};
+    Serial.println("Toggling Maze Speed");
+    toggleSettingLevel(mazeSpeedLevel, mazeSpeedLevelLast, mazeSpeed, levelValues, levelsText, 3);
+    Serial.println(mazeSpeedLevel);  // Debug
+    saveMazeSpeed(mazeSpeed);
+}
+
+void toggleVictoryTimeout() {
+    const int levelValues[3] = {1000, 2000, 4000};  // Time maze stays on screen
+    const String levelsText[3] = {"SHT", "MED", "LNG"};
+    Serial.println("Toggling Victory Timeout");
+    toggleSettingLevel(victoryTimeoutLevel, victoryTimeoutLevelLast, victoryTimeout, levelValues, levelsText, 3);
+    Serial.println(victoryTimeoutLevel);  // Debug
+    saveVictoryTimeout(victoryTimeout);
+}
+
+void togglePlayer2() {
+    const int levelValues[2] = {0, 1};  // 0 = OFF, 1 = ON
+    const String levelsText[2] = {"OFF", "ON"};
+    int player2ToggleInt = static_cast<int>(player2Toggle);
+    Serial.println("Toggling Player 2");
+    toggleSettingLevel(player2Level, player2LevelLast, player2ToggleInt, levelValues, levelsText, 2);
+    Serial.println(player2Level);  // Debug
+    savePlayer2(player2Level);
+}
+
 
 // Toggle brightness levels
-void toggleSettingLevel(String& currentSettingLevel, int& currentSettingValue, const int settingLevelValues[3], const String levelsText[3]) {
+void toggleSettingLevel(String& currentSettingLevel, String& currentSettingLevelLast, int& currentSettingValue, const int settingLevelValues[], const String levelsText[], const int arraySize) {
     //static String defaultLevels[3] = {"LO", "MD", "HI"};
     //if (levelsText == nullptr) {
     //    levelsText = defaultLevels;
@@ -215,54 +269,42 @@ void toggleSettingLevel(String& currentSettingLevel, int& currentSettingValue, c
             if (i > 2)
             {
                 currentSettingLevel = levelsText[0];
-                currentSettingLevel= settingLevelValues[0];    // 2/3 of 255
+                currentSettingLevel = levelsText[0];
+                currentSettingValue = settingLevelValues[0];    
             }else{
                 currentSettingLevel = levelsText[i];
-                currentSettingLevel = settingLevelValues[i];    // 2/3 of 255
+                currentSettingLevel = levelsText[i];
+                currentSettingValue = settingLevelValues[i];  
             }
             break;
         }
     }
     
-
-    if (currentSettingLevel.equals(levelsText[0])) {
-        brightnessLevel = "MD";
-        brightnessPWM = 170;    // 2/3 of 255
-    } else if (brightnessLevel.equals("MD")) {
-        brightnessLevel = "LO";
-        brightnessPWM = 85;     // 1/3 of 255
-    } else {
-        brightnessLevel = "HI";
-        brightnessPWM = 255;    // 3/3 of 255
-    }
-    //Serial.println(brightnessLevel);    //Debug
-    saveBrightness(brightnessLevel);    //save to settings
-    analogWrite(TFT_LITE, brightnessPWM);   //set brightness level
 }
 
 //load and apply brightness from settings
-int loadBrightnessFromSettings(){
-    brightnessLevel = loadBrightness(); //load from settings
-    //Serial.print("Here is the brightness I loaded ");
-    //Serial.println(brightnessLevel);
-
-    if (brightnessLevel.equals("LO")) {
-        brightnessPWM = 85;     // 1/3 of 255
-    } else if (brightnessLevel.equals("MD")) {
-        brightnessPWM = 170;    // 2/3 of 255
-    } else {
-        brightnessLevel = "HI";
-        brightnessPWM = 255;    // 3/3 of 255
-        //Serial.println("Load brightness from settings defaulted");
-    }
-    return brightnessPWM;
-}
+//int loadBrightnessFromSettings(){
+//    brightnessLevel = loadBrightness(); //load from settings
+//    //Serial.print("Here is the brightness I loaded ");
+//    //Serial.println(brightnessLevel);
+//
+//    if (brightnessLevel.equals("LO")) {
+//        brightnessPWM = 85;     // 1/3 of 255
+//    } else if (brightnessLevel.equals("MD")) {
+//        brightnessPWM = 170;    // 2/3 of 255
+//    } else {
+//        brightnessLevel = "HI";
+//        brightnessPWM = 255;    // 3/3 of 255
+//        //Serial.println("Load brightness from settings defaulted");
+//    }
+//    return brightnessPWM;
+//}
 ////////////////////
 // Utility functions
 ////////////////////
 void drawSimpleButton(String label, String level, int btnX, int btnY) {
     const int labelX = 10;
-    const int labelYOffset = -5;
+    const int labelYOffset = +3;
 
     drawText(label.c_str(), labelX, btnY + labelYOffset, ILI9341_WHITE);               // Draw label
     drawFillRectangle(btnX, btnY, btnWidth, btnHeight, ILI9341_WHITE);                 // Draw button rectangle

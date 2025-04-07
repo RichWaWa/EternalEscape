@@ -54,13 +54,27 @@ const uint16_t DARKGREY = 0x7BEF;
 void initScreen();
 void getTouchPoints(int16_t& x, int16_t& y, int16_t& z);
 
+//Global Variables
+extern int brightnessPWM;               
+extern int playerSpeed; 
+extern int mazeSpeed; 
+extern int victoryTimeout; 
+extern bool player2Toggle;   
+
 // Screen drawing functions
-void drawStrobeScreen(uint16_t color);
 void drawSettingsScreen(const String& macAddress, bool wifiStatus);
 void updateSettingsScreen(int16_t x, int16_t y, int16_t z, bool wifiStatus);
-void checkBrightnessButtonTouch(int16_t x, int16_t y, int16_t z);
+//void checkBrightnessButtonTouch(int16_t x, int16_t y, int16_t z);
+void checkButtonTouch(int16_t x, int16_t y, int16_t z, int16_t btnX, int16_t btnY, const String& label, String& settingLevel, void (*onTouchCallback)());
 void drawElement(int rowA, int colA, char cellType);   //draw the cell element
 void loadingScreen();
+
+//Toggle setting functions
+void toggleBrightness();
+void togglePlayerSpeed();     // Toggles player movement speed
+void toggleMazeSpeed();       // Toggles maze generation speed
+void toggleVictoryTimeout();  // Toggles how long the solved maze stays on screen
+void togglePlayer2();         // Toggles Player 2 on/off
 
 // Helper functions
 void drawSimpleButton(String label, String level, int btnX, int btnY);
@@ -70,8 +84,8 @@ void drawFillScreen(uint16_t color);
 void drawBorderedRectangle(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t borderColor, uint16_t fillColor, uint16_t t);
 void drawTextCentered(const char* text, int16_t centerX, int16_t centerY, uint16_t color);
 void drawFinishSquare(int16_t x, int16_t y, int16_t cellSize);
-int loadBrightnessFromSettings();
-void toggleSettingLevel(String& currentSettingLevel, int& currentSettingValue, const int settingLevelValues[3], const String levels[3]);
-String getBrightnessLevel();
+//int loadBrightnessFromSettings();
+void toggleSettingLevel(String& currentSettingLevel, String& currentSettingLevelLast, int& currentSettingValue, const int settingLevelValues[], const String levels[], const int arraySize);
+//String getBrightnessLevel();
 
 #endif // SCREEN_H
