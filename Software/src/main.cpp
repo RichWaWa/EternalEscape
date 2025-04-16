@@ -56,10 +56,19 @@ void setup() {
   Serial.begin(115200);
   analogReadResolution(10);
   srand(time(0));  // Seed random number generator
+  pinMode(TFT_LITE, OUTPUT); //set the PWM output for the backlight
+  initializePreferences();
+  //load preferences.
+  brightnessPWM = loadBrightness();
+  analogWrite(TFT_LITE, brightnessPWM);   //set brightness level
+  playerSpeed = loadPlayerSpeed();
+  mazeSpeed = loadMazeSpeed();
+  victoryTimeout = loadVictoryTimeout();
+  player2Toggle = loadPlayer2();
+
   // Initialize the TFT display
   initScreen();
   //waitForSerial();  //debug statement 
-
   //Get MAC address
   macAddr = getMACAddress();
   //Connect to WiFi 

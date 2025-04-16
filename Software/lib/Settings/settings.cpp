@@ -3,6 +3,13 @@
 
 #include "settings.h"
 
+//Global Variables
+int brightnessPWM = 255;                //Default brightness PWM
+int playerSpeed = 100; 
+int mazeSpeed = 10; 
+int victoryTimeout = 4000; 
+bool player2Toggle = false;                          //default off
+
 // Create a global Preferences object
 Preferences preferences;
 
@@ -13,7 +20,7 @@ void initializePreferences() {
     // Check if this is the first run by looking for a "firstRun" key
     if (!preferences.isKey("firstRun")) {
         // Set default values for all settings
-        preferences.putString("brightness", "HI");   // Default brightness level
+        preferences.putInt("brightness", 255);   // Default brightness level
         preferences.putInt("playerSpeed", 100);        // Default player move speed
         preferences.putInt("mazeSpeed", 10);           // Default maze generation speed
         preferences.putInt("victoryTimeout", 4000);      // Default victory timeout

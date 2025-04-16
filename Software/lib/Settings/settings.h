@@ -5,6 +5,13 @@
 #include <Arduino.h>
 #include <String.h>
 
+//Global Variables
+extern int brightnessPWM;               
+extern int playerSpeed; 
+extern int mazeSpeed; 
+extern int victoryTimeout; 
+extern bool player2Toggle;   
+
 // Initialize preferences
 void initializePreferences();
 

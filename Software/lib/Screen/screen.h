@@ -48,24 +48,17 @@ const uint16_t DARKGREY = 0x7BEF;
 // define valid pressure ranges to eliminate error
 // NOTE These will likely need to be adjusted for your display!!!
 #define MINPRESSURE 150
-#define MAXPRESSURE 3000
+#define MAXPRESSURE 2000
 
 // Initialization functions
 void initScreen();
 void getTouchPoints(int16_t& x, int16_t& y, int16_t& z);
 
-//Global Variables
-extern int brightnessPWM;               
-extern int playerSpeed; 
-extern int mazeSpeed; 
-extern int victoryTimeout; 
-extern bool player2Toggle;   
-
 // Screen drawing functions
 void drawSettingsScreen(const String& macAddress, bool wifiStatus);
-void updateSettingsScreen(int16_t x, int16_t y, int16_t z, bool wifiStatus);
+void updateSettingsScreen(const int16_t &x, const int16_t &y, const int16_t &z, bool wifiStatus);
 //void checkBrightnessButtonTouch(int16_t x, int16_t y, int16_t z);
-void checkButtonTouch(int16_t x, int16_t y, int16_t z, int16_t btnX, int16_t btnY, const String& label, String& settingLevel, void (*onTouchCallback)());
+void checkButtonTouch(const int16_t &x, const int16_t &y, const int16_t &z, int16_t btnX, int16_t btnY, const String& label, String& settingLevel, void (*onTouchCallback)());
 void drawElement(int rowA, int colA, char cellType);   //draw the cell element
 void loadingScreen();
 

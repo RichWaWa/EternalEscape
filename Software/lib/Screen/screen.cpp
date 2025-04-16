@@ -4,12 +4,13 @@
 // Global variables for TFT and touchscreen
 Adafruit_ILI9341 tft(TFT_CS, TFT_DC, TFT_RST);  // Initialize tft with required pin values
 TouchScreen ts(TS_XP, TS_YP, TS_XM, TS_YM, TS_RES);  // Initialize ts with required pin values and resistance
-//Global Variables
-int brightnessPWM = 255;                //Default brightness PWM
-int playerSpeed = 100; 
-int mazeSpeed = 10; 
-int victoryTimeout = 4000; 
-bool player2Toggle = false;                          //default off
+
+//Button Dimentions and vars
+const int16_t btnWidth = 60;  // Width of the rectangle
+const int16_t btnHeight = 24; // Height of the rectangle
+const int16_t xShift = 80;      // number to shift the alt text by.
+
+bool wifiStatusLast = false;        //tracks whether the wifi status has changed or not 
 
 //Brightness button Variables
 const int16_t btnBrightnessX = 150;     // X-coordinate of the rectangle
@@ -19,7 +20,7 @@ String brightnessLevelLast = "";
 
 //speed the players move
 //time between each player moves //LO, MD, HI = 500, 300, 100
-const int16_t btnPlayerSpeedX = 150;
+const int16_t btnPlayerSpeedX = 150 + xShift;
 const int16_t btnPlayerSpeedY = 135;
 String playerSpeedLevel = "HI";              // Default player speed
 String playerSpeedLevelLast = "";            // Last player speed value
@@ -33,7 +34,7 @@ String mazeSpeedLevelLast = "";              // Last maze speed value
 
 //maze complete timeout (how long the finished maze stays on screen)
 //time that the solved maze stays on screen //1, 2, 4 = 1000, 2000, 4000
-const int16_t btnTimeoutX = 150;
+const int16_t btnTimeoutX = 150 + xShift;
 const int16_t btnTimeoutY = 185;
 String victoryTimeoutLevel = "4";             // Default victory timeout
 String victoryTimeoutLevelLast = "";          // Last victory timeout value
@@ -44,12 +45,7 @@ const int16_t btnPlayer2X = 150;
 const int16_t btnPlayer2Y = 210;
 String player2Level = "OFF";                    // Default Player 2 status
 String player2LevelLast = "";                   // Last Player 2 status value
-
-//Button Dimentions
-const int16_t btnWidth = 60;  // Width of the rectangle
-const int16_t btnHeight = 24; // Height of the rectangle
-
-bool wifiStatusLast = false;        //tracks whether the wifi status has changed or not  
+ 
 // Debounce tracking variables
 unsigned long lastTouchTime = 0;
 const unsigned long debounceDelay = 300; // 300ms debounce delay
@@ -59,16 +55,7 @@ void initScreen() {
     tft.begin(SPI_FREQUENCY);
     tft.setRotation(3); //sets the correct screen orientation. (SD card facing down. If you didnt do this, set it to 1)
     tft.fillScreen(ILI9341_BLACK);  
-    pinMode(TFT_LITE, OUTPUT); //set the PWM output for the backlight
     //need to load the brightness from the settings
-    brightnessPWM = loadBrightness();
-    analogWrite(TFT_LITE, brightnessPWM);   //set brightness level
-
-    playerSpeed = loadPlayerSpeed();
-    mazeSpeed = loadMazeSpeed();
-    victoryTimeout = loadVictoryTimeout();
-    player2Toggle = loadPlayer2();
-
     loadingScreen();    //show the loading screen 
 }
 
@@ -110,7 +97,7 @@ void drawSettingsScreen(const String& macAddress, bool wifiStatus) {
 }
 
 // Update the settings screen (partial updates only)
-void updateSettingsScreen(int16_t x, int16_t y, int16_t z ,bool wifiStatus) {
+void updateSettingsScreen(const int16_t &x, const int16_t &y, const int16_t &z ,bool wifiStatus) {
     // Update wifi status only if it has changed
     if (wifiStatus != wifiStatusLast) {
         int16_t x1, y1;
@@ -146,26 +133,28 @@ void getTouchPoints(int16_t& x, int16_t& y, int16_t& z) {
     y = tft.height() - y;   // Adjust Y-axis to invert it, leaving  Y-axis: rightwards
 
     //Uncomment these lines to read the touchscreen printouts!
-    //Serial.print("Touch detected at: ");
-    //Serial.print("X=");
-    //Serial.print(touchPoint.x);
-    //Serial.print(", Y=");
-    //Serial.print(touchPoint.y);
-    //Serial.print(", Z=");
-    //Serial.println(touchPoint.z);
+    if (z > MINPRESSURE && z < MAXPRESSURE) {
+        Serial.print("Touch detected at: ");
+        Serial.print("X=");
+        Serial.print(touchPoint.x);
+        Serial.print(", Y=");
+        Serial.print(touchPoint.y);
+        Serial.print(", Z=");
+        Serial.println(touchPoint.z);
 
-    //These lines are to confirm the mapped touch points
-    //Serial.print("Mapped Touch detected at: ");
-    //Serial.print("X=");
-    //Serial.print(x);
-    //Serial.print(", Y=");
-    //Serial.print(y);
-    //Serial.print(", Z=");
-    //Serial.println(z);
+        //These lines are to confirm the mapped touch points
+        Serial.print("Mapped Touch detected at: ");
+        Serial.print("X=");
+        Serial.print(x);
+        Serial.print(", Y=");
+        Serial.print(y);
+        Serial.print(", Z=");
+        Serial.println(z);
+    }
 }
 
 //check if a button was toggled
-void checkButtonTouch(int16_t x, int16_t y, int16_t z, int16_t btnX, int16_t btnY, const String& label, String& settingLevel, void (*onTouchCallback)()) {
+void checkButtonTouch(const int16_t &x, const int16_t &y, const int16_t &z, int16_t btnX, int16_t btnY, const String& label, String& settingLevel, void (*onTouchCallback)()) {
     if (z > MINPRESSURE && z < MAXPRESSURE) {
         if (x >= btnX && x <= (btnX + btnWidth) &&
             y >= btnY && y <= (btnY + btnHeight)) {
@@ -207,7 +196,7 @@ void toggleBrightness() {
     // Change brightness level
     const int levelValues[3] = {85, 128, 255};
     const String levelsText[3] = {"LO", "MD", "HI"};
-    Serial.println("Hey! I wanna change the brightness now");
+    Serial.println("Changing Brightness");
     toggleSettingLevel(brightnessLevel, brightnessLevelLast, brightnessPWM, levelValues, levelsText, 3);
     //if (brightnessLevel != brightnessLevelLast) {
     //    brightnessLevelLast = brightnessLevel;
@@ -262,7 +251,7 @@ void toggleSettingLevel(String& currentSettingLevel, String& currentSettingLevel
     //if (levelsText == nullptr) {
     //    levelsText = defaultLevels;
     //}
-    for (size_t i = 0; i < 3; i++)
+    for (size_t i = 0; i < arraySize; i++)
     {
         if (currentSettingLevel.equals(levelsText[i])) {
             i += 1;
@@ -303,10 +292,10 @@ void toggleSettingLevel(String& currentSettingLevel, String& currentSettingLevel
 // Utility functions
 ////////////////////
 void drawSimpleButton(String label, String level, int btnX, int btnY) {
-    const int labelX = 10;
+    //Caculate offsets (for shifting text over)
     const int labelYOffset = +3;
 
-    drawText(label.c_str(), labelX, btnY + labelYOffset, ILI9341_WHITE);               // Draw label
+    drawText(label.c_str(), btnX-140, btnY + labelYOffset, ILI9341_WHITE);               // Draw label
     drawFillRectangle(btnX, btnY, btnWidth, btnHeight, ILI9341_WHITE);                 // Draw button rectangle
     drawTextCentered(level.c_str(), btnX + (btnWidth / 2), btnY + (btnHeight / 2), ILI9341_BLACK); // Centered text
 }
