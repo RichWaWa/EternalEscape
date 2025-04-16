@@ -40,10 +40,10 @@ const uint16_t DARKGREY = 0x7BEF;
 // Touchscreen calibration values
 //These are needed to map the calibration values.
 //You WILL need to adjust these for your screen. See WIKI
-#define TS_MINX 806            // Default 150
+#define TS_MINX 820            // Default 150
 #define TS_MINY 810            // Default 120
-#define TS_MAXX 972            // Default 920
-#define TS_MAXY 983            // Default 940
+#define TS_MAXX 960            // Default 920
+#define TS_MAXY 985            // Default 940
 #define TS_RES 332             // Touch screen resistance (ADJUST FOR YOUR DISPLAY, But this value may be close enough!)
 // define valid pressure ranges to eliminate error
 // NOTE These will likely need to be adjusted for your display!!!

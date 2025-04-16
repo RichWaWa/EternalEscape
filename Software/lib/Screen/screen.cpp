@@ -127,10 +127,15 @@ void updateSettingsScreen(const int16_t &x, const int16_t &y, const int16_t &z ,
 void getTouchPoints(int16_t& x, int16_t& y, int16_t& z) {
     TSPoint touchPoint = ts.getPoint();
     // Map x and y to origin at top left corner.
-    x = map(touchPoint.x, TS_MINY, TS_MAXY, 0, tft.width());        // X-axis: downwards
-    y = map(touchPoint.y, TS_MINX, TS_MAXX, 0, tft.height()); 
+    //NOTE
+    //TFT_WIDTH 320
+    //TFT_HEIGHT 240
+    //Note, the screens touchpoint mapping is different from how we have it installed!
+    y = map(touchPoint.x, TS_MINY, TS_MAXY, 0, tft.width());
+    x = map(touchPoint.y, TS_MINX, TS_MAXX, 0, tft.height()); 
     z = abs(touchPoint.z);
-    y = tft.height() - y;   // Adjust Y-axis to invert it, leaving  Y-axis: rightwards
+    //y = tft.width() - y;    // Adjust Y-axis to invert it, leaving  Y-axis: rightwards
+    x = tft.height() - x;   //invert X-Axis 
 
     //Uncomment these lines to read the touchscreen printouts!
     if (z > MINPRESSURE && z < MAXPRESSURE) {
