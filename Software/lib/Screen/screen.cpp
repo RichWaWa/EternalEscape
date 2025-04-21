@@ -11,8 +11,8 @@ const int16_t btnHeight = 24; // Height of the rectangle
 const int16_t xShift = 80;      // number to shift the alt text by.
 
 //touchpoint shifts
-const int16_t touchPointShiftX = -60;
-const int16_t touchPointShifty = 30;
+const int16_t touchPointShiftX = +60;
+const int16_t touchPointShifty = -30;
 
 //misc vars
 bool wifiStatusLast = false;        //tracks whether the wifi status has changed or not 
