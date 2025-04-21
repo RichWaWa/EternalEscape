@@ -10,6 +10,11 @@ const int16_t btnWidth = 60;  // Width of the rectangle
 const int16_t btnHeight = 24; // Height of the rectangle
 const int16_t xShift = 80;      // number to shift the alt text by.
 
+//touchpoint shifts
+const int16_t touchPointShiftX = -60;
+const int16_t touchPointShifty = 30;
+
+//misc vars
 bool wifiStatusLast = false;        //tracks whether the wifi status has changed or not 
 
 //Brightness button Variables
@@ -134,8 +139,9 @@ void getTouchPoints(int16_t& x, int16_t& y, int16_t& z) {
     y = map(touchPoint.x, TS_MINY, TS_MAXY, 0, tft.width());
     x = map(touchPoint.y, TS_MINX, TS_MAXX, 0, tft.height()); 
     z = abs(touchPoint.z);
-    //y = tft.width() - y;    // Adjust Y-axis to invert it, leaving  Y-axis: rightwards
-    x = tft.height() - x;   //invert X-Axis 
+    //transformations to touchpoints  
+    x = (tft.height() - x) + touchPointShiftX;   //invert X-Axis 
+    y = y + touchPointShifty;
 
     //Uncomment these lines to read the touchscreen printouts!
     if (z > MINPRESSURE && z < MAXPRESSURE) {
@@ -248,7 +254,6 @@ void togglePlayer2() {
     Serial.println(player2Level);  // Debug
     savePlayer2(player2Level);
 }
-
 
 // Toggle brightness levels
 void toggleSettingLevel(String& currentSettingLevel, String& currentSettingLevelLast, int& currentSettingValue, const int settingLevelValues[], const String levelsText[], const int arraySize) {
