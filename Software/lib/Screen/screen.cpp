@@ -21,7 +21,6 @@ bool wifiStatusLast = false;        //tracks whether the wifi status has changed
 const int16_t btnBrightnessX = 150;     // X-coordinate of the rectangle
 const int16_t btnBrightnessY = 110;     // Y-coordinate of the rectangle
 String brightnessLevel = "HI";          // Default brightness level
-String brightnessLevelLast = "";
 const int brightnessLevelValues[3] = {85, 128, 255};
 const String brightnessLevelsText[3] = {"LO", "MD", "HI"};  
 
@@ -30,7 +29,6 @@ const String brightnessLevelsText[3] = {"LO", "MD", "HI"};
 const int16_t btnPlayerSpeedX = 150 + xShift;
 const int16_t btnPlayerSpeedY = 135;
 String playerSpeedLevel = "HI";              // Default player speed
-String playerSpeedLevelLast = "";            // Last player speed value
 const int playerSpeedLevelValues[3] = {500, 300, 100};  // Time between player moves
 const String playerSpeedLevelsText[3] = {"LO", "MD", "HI"};
 
@@ -39,7 +37,6 @@ const String playerSpeedLevelsText[3] = {"LO", "MD", "HI"};
 const int16_t btnMazeSpeedX = 150;
 const int16_t btnMazeSpeedY = 160;
 String mazeSpeedLevel = "HI";                // Default maze speed
-String mazeSpeedLevelLast = "";              // Last maze speed value 
 const int mazeSpeedLevelValues[3] = {80, 40, 10};  // Maze generation delay
 const String mazeSpeedLevelsText[3] = {"LO", "MD", "HI"};
 
@@ -48,7 +45,6 @@ const String mazeSpeedLevelsText[3] = {"LO", "MD", "HI"};
 const int16_t btnTimeoutX = 150 + xShift;
 const int16_t btnTimeoutY = 185;
 String victoryTimeoutLevel = "LNG";             // Default victory timeout
-String victoryTimeoutLevelLast = "";          // Last victory timeout value
 const int victoryTimeoutLevelValues[3] = {1000, 2000, 4000};  // Time maze stays on screen
 const String victoryTimeoutLevelsText[3] = {"SHT", "MED", "LNG"};
 
@@ -57,7 +53,6 @@ const String victoryTimeoutLevelsText[3] = {"SHT", "MED", "LNG"};
 const int16_t btnPlayer2X = 150;
 const int16_t btnPlayer2Y = 210;
 String player2Level = "OFF";                    // Default Player 2 status
-String player2LevelLast = "";                   // Last Player 2 status value
 const int player2LevelValues[2] = {0, 1};  // 0 = OFF, 1 = ON
 const String player2LevelsText[2] = {"OFF", "ON"};
  
@@ -141,11 +136,33 @@ void updateSettingsScreen(const int16_t &x, const int16_t &y, const int16_t &z ,
     }
 
     // Update settings if they have changed
-    checkButtonTouch(x, y, z, btnBrightnessX, btnBrightnessY, "Brightness", brightnessLevel, toggleBrightness);
-    checkButtonTouch(x, y, z, btnPlayerSpeedX, btnPlayerSpeedY, "PlayerSpeed", playerSpeedLevel, togglePlayerSpeed);
-    checkButtonTouch(x, y, z, btnMazeSpeedX, btnMazeSpeedY, "MazeSpeed", mazeSpeedLevel, toggleMazeSpeed);
-    checkButtonTouch(x, y, z, btnTimeoutX, btnTimeoutY, "Timeout", victoryTimeoutLevel, toggleVictoryTimeout);
-    checkButtonTouch(x, y, z, btnPlayer2X, btnPlayer2Y, "Player2", player2Level, togglePlayer2);
+    checkButtonTouch(x, y, z, btnBrightnessX, btnBrightnessY, "Brightness", brightnessLevel, []() {
+        toggleSettingLevel(brightnessLevel, brightnessPWM, brightnessLevelValues, brightnessLevelsText, 3, [](){
+            analogWrite(TFT_LITE, brightnessPWM); // Set brightness level
+            saveBrightness(brightnessPWM);
+        });
+    });
+    checkButtonTouch(x, y, z, btnPlayerSpeedX, btnPlayerSpeedY, "PlayerSpeed", playerSpeedLevel, [](){
+        toggleSettingLevel(playerSpeedLevel, playerSpeed, playerSpeedLevelValues, playerSpeedLevelsText, 3, [](){
+            savePlayerSpeed(playerSpeed);
+        });
+    });
+    checkButtonTouch(x, y, z, btnMazeSpeedX, btnMazeSpeedY, "MazeSpeed", mazeSpeedLevel, [](){
+        toggleSettingLevel(mazeSpeedLevel, mazeSpeed, mazeSpeedLevelValues, mazeSpeedLevelsText, 3, [](){
+            saveMazeSpeed(mazeSpeed);
+        });
+    });
+    checkButtonTouch(x, y, z, btnTimeoutX, btnTimeoutY, "Timeout", victoryTimeoutLevel, [](){
+        toggleSettingLevel(victoryTimeoutLevel, victoryTimeout, victoryTimeoutLevelValues, victoryTimeoutLevelsText, 3, [](){
+            saveVictoryTimeout(victoryTimeout);
+        });
+    });
+    checkButtonTouch(x, y, z, btnPlayer2X, btnPlayer2Y, "Player2", player2Level, [](){
+        int player2ToggleInt = static_cast<int>(player2Toggle); // Cast to int for comparison
+        toggleSettingLevel(player2Level, player2ToggleInt, player2LevelValues, player2LevelsText, 2, [](){
+            savePlayer2(player2Toggle);
+        });
+    });
 
 }
 
@@ -190,7 +207,7 @@ void getTouchPoints(int16_t& x, int16_t& y, int16_t& z) {
 
 //check if a button was toggled
 void checkButtonTouch(const int16_t &x, const int16_t &y, const int16_t &z, int16_t btnX, int16_t btnY, 
-    const String& label, String& settingLevel, void (*onTouchCallback)()) {
+    const String& label, String& settingLevel, std::function<void()> onTouchCallback) {
     if (z > MINPRESSURE && z < MAXPRESSURE) {
         if (x >= btnX && x <= (btnX + btnWidth) &&
             y >= btnY && y <= (btnY + btnHeight)) {
@@ -228,48 +245,10 @@ void loadingScreen() {
     drawTextCentered("Loading...", tft.width() / 2, tft.height() / 2 + 20, ILI9341_DARKGREY);
 }
 
-void toggleBrightness() {
-    // Change brightness level
-    Serial.println("Changing Brightness");
-    toggleSettingLevel(brightnessLevel, brightnessLevelLast, brightnessPWM, brightnessLevelValues, brightnessLevelsText, 3);
-    Serial.println(brightnessLevel);    //Debug
-    saveBrightness(brightnessPWM);    //save to settings
-    analogWrite(TFT_LITE, brightnessPWM);   //set brightness level
-} 
-
-void togglePlayerSpeed() {
-    Serial.println("Toggling Player Speed");
-    toggleSettingLevel(playerSpeedLevel, playerSpeedLevelLast, playerSpeed, levelValues, levelsText, 3);
-    Serial.println(playerSpeedLevel);  // Debug
-    savePlayerSpeed(playerSpeed);
-}
-
-void toggleMazeSpeed() {
-    Serial.println("Toggling Maze Speed");
-    toggleSettingLevel(mazeSpeedLevel, mazeSpeedLevelLast, mazeSpeed, levelValues, levelsText, 3);
-    Serial.println(mazeSpeedLevel);  // Debug
-    saveMazeSpeed(mazeSpeed);
-}
-
-void toggleVictoryTimeout() {
-    Serial.println("Toggling Victory Timeout");
-    toggleSettingLevel(victoryTimeoutLevel, victoryTimeoutLevelLast, victoryTimeout, levelValues, levelsText, 3);
-    Serial.println(victoryTimeoutLevel);  // Debug
-    saveVictoryTimeout(victoryTimeout);
-}
-
-void togglePlayer2() {
-    int player2ToggleInt = static_cast<int>(player2Toggle);
-    Serial.println("Toggling Player 2");
-    toggleSettingLevel(player2Level, player2LevelLast, player2ToggleInt, levelValues, levelsText, 2);
-    Serial.println(player2Level);  // Debug
-    savePlayer2(player2Level);
-}
 
 // Toggle settings levels
-void toggleSettingLevel(String& currentSettingLevel, String& currentSettingLevelLast, 
-    int& currentSettingValue, const int settingLevelValues[], const String levelsText[], 
-    const int arraySize) {
+void toggleSettingLevel(String& currentSettingLevel, int& currentSettingValue, 
+    const int settingLevelValues[], const String levelsText[], const int arraySize, std::function<void()> saveCallback) {
     for (size_t i = 0; i < arraySize; i++)
     {
         if (currentSettingLevel.equals(levelsText[i])) {
@@ -283,6 +262,10 @@ void toggleSettingLevel(String& currentSettingLevel, String& currentSettingLevel
                 currentSettingLevel = levelsText[i];
                 currentSettingLevel = levelsText[i];
                 currentSettingValue = settingLevelValues[i];  
+            }
+            // Call the provided save settings function
+            if (saveCallback != nullptr) {
+                saveCallback();
             }
             break;
         }

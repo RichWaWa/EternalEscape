@@ -2,6 +2,7 @@
 #define SCREEN_H
 
 #include <Adafruit_ILI9341.h>
+#include <functional>
 #include "TouchScreen.h"
 
 //Color declararions
@@ -54,13 +55,15 @@ const uint16_t DARKGREY = 0x7BEF;
 void initScreen();
 void initSettingsTextLevels();
 void getTouchPoints(int16_t& x, int16_t& y, int16_t& z);
-void loadSettingLevelText(String& currentSettingLevel, int& currentSettingValue, const int settingLevelValues[], const String levelsText[], const int arraySize);
+void loadSettingLevelText(String& currentSettingLevel, int& currentSettingValue, 
+    const int settingLevelValues[], const String levelsText[], const int arraySize);
 
 // Screen drawing functions
 void drawSettingsScreen(const String& macAddress, bool wifiStatus);
 void updateSettingsScreen(const int16_t &x, const int16_t &y, const int16_t &z, bool wifiStatus);
 //void checkBrightnessButtonTouch(int16_t x, int16_t y, int16_t z);
-void checkButtonTouch(const int16_t &x, const int16_t &y, const int16_t &z, int16_t btnX, int16_t btnY, const String& label, String& settingLevel, void (*onTouchCallback)());
+void checkButtonTouch(const int16_t &x, const int16_t &y, const int16_t &z, int16_t btnX, 
+    int16_t btnY, const String& label, String& settingLevel, std::function<void()> onTouchCallback);
 void drawElement(int rowA, int colA, char cellType);   //draw the cell element
 void loadingScreen();
 
@@ -76,11 +79,13 @@ void drawSimpleButton(String label, String level, int btnX, int btnY);
 void drawText(const char* text, int16_t x, int16_t y, uint16_t color);
 void drawFillRectangle(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
 void drawFillScreen(uint16_t color);
-void drawBorderedRectangle(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t borderColor, uint16_t fillColor, uint16_t t);
+void drawBorderedRectangle(int16_t x, int16_t y, int16_t w, int16_t h, 
+    uint16_t borderColor, uint16_t fillColor, uint16_t t);
 void drawTextCentered(const char* text, int16_t centerX, int16_t centerY, uint16_t color);
 void drawFinishSquare(int16_t x, int16_t y, int16_t cellSize);
 //int loadBrightnessFromSettings();
-void toggleSettingLevel(String& currentSettingLevel, String& currentSettingLevelLast, int& currentSettingValue, const int settingLevelValues[], const String levels[], const int arraySize);
+void toggleSettingLevel(String& currentSettingLevel, int& currentSettingValue, 
+    const int settingLevelValues[], const String levels[], const int arraySize,  std::function<void()> saveCallback);
 //String getBrightnessLevel();
 
 #endif // SCREEN_H

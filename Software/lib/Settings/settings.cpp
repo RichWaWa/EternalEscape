@@ -34,7 +34,7 @@ void initializePreferences() {
 // Function to save the brightness level (as int)
 void saveBrightness(int brightness) {
     preferences.begin("settings", false);
-    preferences.putInt("brightness", brightness);
+    preferences.putInt("brightness", brightnessPWM);
     preferences.end();
 }
 
