@@ -59,14 +59,13 @@ void setup() {
   pinMode(TFT_LITE, OUTPUT); //set the PWM output for the backlight
   initializePreferences();
   //load preferences.
-  waitForSerial();  //debug statement 
+  //waitForSerial();  //debug statement 
   brightnessPWM = loadBrightness();
   analogWrite(TFT_LITE, brightnessPWM);   //set brightness level
   playerSpeed = loadPlayerSpeed();
   mazeSpeed = loadMazeSpeed();
   victoryTimeout = loadVictoryTimeout();
   player2Toggle = loadPlayer2();
-  Serial.println("Setup Player 2 toggle is: " + String(player2Toggle));
   initSettingsTextLevels(); //load the settings levels for the buttons
 
   // Initialize the TFT display
@@ -178,7 +177,6 @@ void maze(){
         player1.clearPositions();  //reset the path
         player1.addPosition(getStartPositions()[0].first, getStartPositions()[0].second);
         //Determine if we need to enable player two, if we do, emable and set it up.
-        Serial.println("Player 2 toggle is: " + String(player2Toggle));
         if (player2Toggle && !player2) {
           Serial.println("Creating player2");
           player2 = new Player('B');
