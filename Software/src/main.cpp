@@ -159,7 +159,12 @@ void maze(){
   static Player* player2 = nullptr;
   if (player2Toggle && !player2) {
     player2 = new Player('B');
+  } else if (!player2Toggle && player2) {
+    // Delete player2 if toggle is disabled and player2 exists
+    delete player2;
+    player2 = nullptr;
   }
+
   //Start main programloop for the maze screen state
   if (currentState == MAZESCREEN) {
     if(!mazeScreenOpenLast || (mazeSolved && (millis() - mazeSolvedTime > victoryTimeout))){
