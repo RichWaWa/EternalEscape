@@ -52,7 +52,9 @@ const uint16_t DARKGREY = 0x7BEF;
 
 // Initialization functions
 void initScreen();
+void initSettingsTextLevels();
 void getTouchPoints(int16_t& x, int16_t& y, int16_t& z);
+void loadSettingLevelText(String& currentSettingLevel, int& currentSettingValue, const int settingLevelValues[], const String levelsText[], const int arraySize);
 
 // Screen drawing functions
 void drawSettingsScreen(const String& macAddress, bool wifiStatus);

@@ -65,6 +65,7 @@ void setup() {
   mazeSpeed = loadMazeSpeed();
   victoryTimeout = loadVictoryTimeout();
   player2Toggle = loadPlayer2();
+  initSettingsTextLevels(); //load the settings levels for the buttons
 
   // Initialize the TFT display
   initScreen();
