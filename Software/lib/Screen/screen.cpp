@@ -53,6 +53,7 @@ const String victoryTimeoutLevelsText[3] = {"SHT", "MED", "LNG"};
 const int16_t btnPlayer2X = 150;
 const int16_t btnPlayer2Y = 210;
 String player2Level = "OFF";                    // Default Player 2 status
+int player2ToggleInt = 0; // Default Player 2 status as int
 const int player2LevelValues[2] = {0, 1};  // 0 = OFF, 1 = ON
 const String player2LevelsText[2] = {"OFF", "ON"};
  
@@ -158,8 +159,9 @@ void updateSettingsScreen(const int16_t &x, const int16_t &y, const int16_t &z ,
         });
     });
     checkButtonTouch(x, y, z, btnPlayer2X, btnPlayer2Y, "Player2", player2Level, [](){
-        int player2ToggleInt = static_cast<int>(player2Toggle); // Cast to int for comparison
+        player2ToggleInt = static_cast<int>(player2Toggle); // Cast to int for comparison
         toggleSettingLevel(player2Level, player2ToggleInt, player2LevelValues, player2LevelsText, 2, [](){
+            player2Toggle = static_cast<bool>(player2ToggleInt); // Cast back to bool for storage
             savePlayer2(player2Toggle);
         });
     });

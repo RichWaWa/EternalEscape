@@ -59,17 +59,18 @@ void setup() {
   pinMode(TFT_LITE, OUTPUT); //set the PWM output for the backlight
   initializePreferences();
   //load preferences.
+  waitForSerial();  //debug statement 
   brightnessPWM = loadBrightness();
   analogWrite(TFT_LITE, brightnessPWM);   //set brightness level
   playerSpeed = loadPlayerSpeed();
   mazeSpeed = loadMazeSpeed();
   victoryTimeout = loadVictoryTimeout();
   player2Toggle = loadPlayer2();
+  Serial.println("Setup Player 2 toggle is: " + String(player2Toggle));
   initSettingsTextLevels(); //load the settings levels for the buttons
 
   // Initialize the TFT display
   initScreen();
-  //waitForSerial();  //debug statement 
   //Get MAC address
   macAddr = getMACAddress();
   //Connect to WiFi 
@@ -157,13 +158,7 @@ void maze(){
   static Player player1('O');
   // Conditionally create player2 as color Blue
   static Player* player2 = nullptr;
-  if (player2Toggle && !player2) {
-    player2 = new Player('B');
-  } else if (!player2Toggle && player2) {
-    // Delete player2 if toggle is disabled and player2 exists
-    delete player2;
-    player2 = nullptr;
-  }
+
 
   //Start main programloop for the maze screen state
   if (currentState == MAZESCREEN) {
@@ -182,7 +177,19 @@ void maze(){
         // Find Start and store in player positions
         player1.clearPositions();  //reset the path
         player1.addPosition(getStartPositions()[0].first, getStartPositions()[0].second);
-        // If player2 exists, set it up
+        //Determine if we need to enable player two, if we do, emable and set it up.
+        Serial.println("Player 2 toggle is: " + String(player2Toggle));
+        if (player2Toggle && !player2) {
+          Serial.println("Creating player2");
+          player2 = new Player('B');
+        } else if (!player2Toggle && player2) {
+          // Delete player2 if toggle is disabled and player2 exists
+          Serial.println("Deleting player2");
+          player2->clearPositions(); // Clear player2's positions
+          delete player2;
+          player2 = nullptr;
+        }
+
         if (player2) {
           player2->clearPositions();
           player2->addPosition(getStartPositions()[1].first, getStartPositions()[1].second);
