@@ -15,6 +15,7 @@ Below is a list of hardware and tools needed to build EternalEscape.
 Some parts are optional and can be substituted for hot glue or double-sided tape. 
 
   * **3D Printed Parts:** STL files located in EternalEscape/Hardware/Exports/
+    - There is an OrcaSlicer project file here, too.
   * **Electronics:**
     - Adafruit Feather ESP32-S3 (2MB PSRAM)
     - Adafruit 2.8" ILI9341 TFT Resistive Touch Display
@@ -56,14 +57,17 @@ Connect the display's pins to the ESP32-S3 as follows:
 
 ---
 
-### **3. Programming the Toy**
+### **3. Programming**
 
 This process involves three key steps: flashing the calibration code, getting the calibration values, and then uploading the main program.
+> **!!IMPORTANT!!** The default calibration values listed in EternalEscape/Software/lib/Screen/screen.h are listed as defaults from Adafruit,
+> and may work better than the values currently set.
+> **If you want to skip the calibration, those values may work best!**
 
-#### **Step 3.1: Setting Up the Project in VSCode**
+#### **3.1: Setting Up the Project in VSCode**
 
 1.  **Clone or Download:** Begin by cloning or downloading the entire EternalEscape repository from GitHub.
-2.  **Install PlatformIO:** Follow the instructions in [this video](https://www.google.com/search?q=https://www.youtube.com/watch%3Fv%3DR9j-o3c20Kk) to install the PlatformIO IDE extension for VSCode.
+2.  **Install PlatformIO:** Follow the instructions in [this video](https://www.youtube.com/watch?v=WxELHnnlBmU) to install the PlatformIO IDE extension for VSCode.
 3.  **Open the Project:** Once the extension is installed, open the `Software` folder of the repository in VSCode. PlatformIO will automatically recognize the project.
 
 #### **Step 3.2: Uploading the Calibration Code**
