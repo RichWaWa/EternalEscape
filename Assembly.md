@@ -14,7 +14,7 @@ Please read through this document carefully before starting the assembly.
 Below is a list of hardware and tools needed to build EternalEscape. 
 Some parts are optional and can be substituted for hot glue or double-sided tape. 
 
-  * **3D Printed Parts:** STL files located in EternalEscape/Hardware/Exports/
+  * **3D Printed Parts:** STL files located in `EternalEscape/Hardware/Exports/`
     - There is an OrcaSlicer project file here, too.
   * **Electronics:**
     - Adafruit Feather ESP32-S3 (2MB PSRAM)
@@ -53,14 +53,14 @@ Connect the display's pins to the ESP32-S3 as follows:
   * **Touch X-** to **ESP32 A1 GPIO17**
 
 
-> **Note:** A wiring diagram can be found in EternalEscale/Hardware/EternalEscape_Wiring_Diagram.jpg
+> **Note:** A wiring diagram can be found in `EternalEscale/Hardware/EternalEscape_Wiring_Diagram.jpg`
 
 ---
 
 ### **3. Programming**
 
 This process involves three key steps: flashing the calibration code, getting the calibration values, and then uploading the main program.
-> **!!IMPORTANT!!** The default calibration values listed in EternalEscape/Software/lib/Screen/screen.h are listed as defaults from Adafruit,
+> **!!IMPORTANT!!** The default calibration values listed in `EternalEscape/Software/lib/Screen/screen.h` are listed as defaults from Adafruit,
 > and may work better than the values currently set.
 > **If you want to skip the calibration, those values may work best!**
 
@@ -68,38 +68,47 @@ This process involves three key steps: flashing the calibration code, getting th
 
 1.  **Clone or Download:** Begin by cloning or downloading the entire EternalEscape repository from GitHub.
 2.  **Install PlatformIO:** Follow the instructions in [this video](https://www.youtube.com/watch?v=WxELHnnlBmU) to install the PlatformIO IDE extension for VSCode.
-3.  **Open the Project:** Once the extension is installed, open the `Software` folder of the repository in VSCode. PlatformIO will automatically recognize the project.
+3.  **Open the Project:** Once the extension is installed, open the `EternalEscale/Software` folder of the repository via the PlatformIO extension. The extension will automatically recognise the project.
 
-#### **Step 3.2: Uploading the Calibration Code**
+#### **3.2: Uploading the Code**
 
 The touch display needs to be calibrated to accurately read touch input.
+> **Note:** I know these calibration steps are confusing; if I find something better, I will update this in the future.
+> Adafruit has several guides on how to calibrate these displays. If you still have issues, create an issue, and I will assist from there.
 
-1.  **Open Calibration Sketch:** Locate the calibration sketch in your `Software` folder.
-2.  **Upload:** Follow the instructions in the video to upload the calibration code to your ESP32-S3. This will compile and flash the code to the board.
-3.  **Calibrate:** Follow the on-screen instructions on the toy's display to calibrate the touch points. This involves touching specific locations as prompted.
+1.  **Uncomment Debug Lines** Uncomment the touch screen output debug lines in `EternalEscape/Software/lib/Screen/screen.cpp`
+    - You can Ctrl+F search for this with `"//Uncomment these lines to read the touchscreen printouts!"`
+3.  **Upload:** Follow the instructions in the video to upload the debug code to your ESP32-S3. This will compile and flash the code to the board.
 
 #### **Step 3.3: Grabbing the Calibration Values**
 
 After calibration, the program will print the calibration values to the serial monitor.
 
-1.  **Open Serial Monitor:** In the PlatformIO toolbar in VSCode, open the Serial Monitor.
-2.  **Record Values:** The calibration values will be displayed in the terminal window. Copy these numbers. They will be similar to `ts.calibrate( ... );`.
+4.  **Open Serial Terminal:** In VSCode, open the Serial Monitor by clicking the plug symbol in the bottom left corner of the window.
+    - Once it connects, you should be able to see the touch outputs.
+2.  **Record Values:** The touch screen position values will be displayed in the terminal window.
+    - Touch and hold a corner of the display, being sure to make note of the values that are printed to the terminal while you are doing so.
+    - Write these numbers down, and repeat for the other three corners
 
 #### **Step 3.4: Modifying and Uploading the Main Code**
 
 Now, you will take those calibration values and use them in the main program.
 
-1.  **Edit the Main Code:** Open the main `EternalEscape.cpp` file. Find the line where the `ts.calibrate()` function is called.
-2.  **Paste Values:** Replace the placeholder values with the calibration numbers you copied from the serial monitor.
-3.  **Upload the Final Program:** Use the PlatformIO upload function again to compile and upload the main program with your new calibration values to the EternalEscape toy.
+1.  **Edit the Configuration:** Open `EternalEscape/Software/lib/Screen/screen.h` and find the line, `// Touchscreen calibration values`. (You can Ctrl+F to search for this)
+2.  **Paste Values:** Replace the values with the calibration numbers you gathered from the serial monitor.
+    - Make note of the mins and maxes for each dimension and be sure to enter them correctly.
+4.  **Upload the Final Program:** Use PlatformIO to compile and upload the main program with your new calibration values to the EternalEscape toy.
 
------
+---
 
 ### **4. Final Assembly**
 
 With the code uploaded, you can now fasten the toy's physical components together.
 
 1.  **Mount the Electronics:** Carefully place the ESP32-S3 and the TFT display into the 3D printed case.
-2.  **Secure the Parts:** Use the M3x8mm bolts to secure the case components. If you're using them, use the optional M3x5mm and M2x3mm bolts for any internal mounting points, as detailed in the CAD files. You can use hot glue as an alternative for the optional fasteners.
-3.  **Check Connections:** Double-check all the wiring one last time to ensure everything is securely connected and not pinched.
+    - The Display should slot into the top slots, then fasten at the bottom using the M3X5mm bolts.
+    - The ESP32-S3's USB-C port should fit into the slot on the bottom part, then fasten to the bottom using the M2X3MM bolts.
+    - Alternatively, you can just use hot glue to secure the components.
+2.  **Check Connections:** Double-check all the wiring one last time to ensure everything is securely connected and not pinched as you close the enclosure.
+3.  **Secure the Parts:** Use the M3x8mm bolts to secure the case components. 
 4.  **Power On:** Connect the device to a USB power source, and your EternalEscape toy should power up, generate a maze, and begin solving it\!
