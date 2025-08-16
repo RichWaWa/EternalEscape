@@ -3,17 +3,17 @@
 ## Main Project Repo for the EternalEscape desktop toy!
 **EternalEscape** is a desktop toy that generates and solves random mazes for endless entertainment and distraction from any productivity! 
 Designed to be both entertaining and mesmerizing, it’s the perfect addition to your workspace. 
-The project is fully open-source and can be built using common materials and components.
+The project is fully open-source and can be built using common materials and components from Adafruit.
 
 ---
 
 ## Features
 
-- **Random Maze Generation:** Creates unique mazes endlessly.  
+- **Random Maze Generation:** Creates unique mazes endlessly using Prim's Algorithm.  
 - **Real-Time Maze Solving:** Watch as the algorithm finds its way out, again and again.
-- **"Fight" Mode:** Watch two algorithms "Fight" each other in the maze. 
+- **Race Mode:** Watch two algorithms race each other in the maze. 
 - **Compact Design:** Fully 3D printable with common hardware components.  
-- **Expandable Functionality:** Networking and a settings GUI are planned for future updates.  
+- **Customization:** Features a GUI to customize various settings of the device.
 
 ---
 
@@ -32,25 +32,29 @@ The project is fully open-source and can be built using common materials and com
 
 ---
 
-## Software
+## Software Requirements
 
-All source code is written in **C++**. Future updates will include networking capabilities and a GUI for adjusting device settings.
+- All source code is written in **C++**!
+- **Compiler:** Upload code to the controller using PlatformIO for VSCode.
+  - You can also use your preferred compiler, but this project is made for PlatformIO. 
 
 ---
 
 ## Assembly
 
-1. **Print the Parts:** Use the provided STL files to 3D print all necessary components.  
-2. **Hardware Assembly:** Secure the parts using the listed bolts or hot glue.  
-3. **Connect Electronics:** Follow the wiring diagram (to be added) to connect the display to the ESP32-S3.  
-4. **Upload the Code:** Flash the provided C++ code to the ESP32-S3 using PlatformIO for VScode
+Assembly of this project is very simple!
+1. **Print the Parts:** Use the provided STL files to 3D print all necessary components.
+2. **Connect Electronics:** Follow the wiring diagram in /Hardware/ to connect the display to the ESP32-S3.
+3. **Upload the Code:** Flash the provided C++ code in /Software/ to the ESP32-S3 using PlatformIO for VScode
+4. **Put it Together:** Secure the parts using the listed bolts or hot glue.   
 
 ---
 
 ## Future Roadmap
 
 - **Networking:** Idk What id do with this, but its something im thinking about.
-- **Customizable Settings:** Implement a GUI for adjusting speed, maze size, and algorithm behavior.  
+- **Fight-Mode:** A snake style fight mmode.
+- **Smooth Traversal:** Add animations to smooth player traversal from location to location.
 
 ---
 
