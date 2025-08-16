@@ -1,10 +1,12 @@
 # EternalEscape Assembly guide
  - REV 0
  - RELEASE 1.0
+   
 ---
 
 This guide will walk you through the steps of printing, calibrating, programming, and assembling your own EternalEscape toy!
 Please read through this document carefully before starting the assembly.
+
 ---
 
 ### **1. Bill of Materials**
