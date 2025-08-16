@@ -4,13 +4,13 @@
 ---
 
 This guide will walk you through the steps of printing, calibrating, programming, and assembling your own EternalEscape toy!
-Pleae be sure to read through this document BEFORE starting the assembly!
+Please read through this document carefully before starting the assembly.
 ---
 
 ### **1. Bill of Materials**
 
 Below is a list of hardware and tools needed to build EternalEscape. 
-Some parts are optional, and can be substituded for hot glue or double sided tape. 
+Some parts are optional and can be substituted for hot glue or double-sided tape. 
 
   * **3D Printed Parts:** STL files located in EternalEscape/Hardware/Exports/
   * **Electronics:**
@@ -25,7 +25,7 @@ Some parts are optional, and can be substituded for hot glue or double sided tap
     - Microsoft Visual Studio Code (VSCode)
     - PlatformIO IDE extension for VSCode
 
------
+---
 
 ### **2. Assembling the Electronics**
 
@@ -37,19 +37,22 @@ Connect the display's pins to the ESP32-S3 as follows:
 
   * **Display GND** to **ESP32 GND**
   * **Display VCC** to **ESP32 3.3V**
-  * **Display SCK** to **ESP32 GPIO18** (or any hardware SPI SCK pin)
-  * **Display MOSI** to **ESP32 GPIO23** (or any hardware SPI MOSI pin)
-  * **Display CS** to **ESP32 GPIO15** (or a different GPIO pin you define in code)
-  * **Display D/C (Data/Command)** to **ESP32 GPIO2** (or a different GPIO pin)
-  * **Display RST (Reset)** to **ESP32 GPIO4** (or a different GPIO pin)
-  * **Display T\_CS** (Touch Chip Select) to **ESP32 GPIO1** (or a different GPIO pin)
-  * **Display T\_CLK** (Touch Clock) to **ESP32 GPIO42** (or a different GPIO pin)
-  * **Display T\_DIN** (Touch Data In) to **ESP32 GPIO2** (or a different GPIO pin)
-  * **Display T\_DO** (Touch Data Out) to **ESP32 GPIO41** (or a different GPIO pin)
+  * **Display CLK** to **ESP32 SCK** (hardware SPI SCK pin)
+  * **Display MOSI** to **ESP32 MO** (hardware SPI MOSI pin)
+  * **Display MISO** to **ESP32 MI** (hardware SPI MISO pin)
+  * **Display CS** to **ESP32 GPIO9** 
+  * **Display D/C** to **ESP32 GPIO6**
+  * **Display RST** to **ESP32 GPIO5**
+  * **Display Lite** to **ESP32 GPIO10**
+  * **Touch Y+** to **ESP32 A4 (GPIO14)**
+  * **Touch X+** to **ESP32 A3 GPIO15**
+  * **Touch Y-** to **ESP32 A2 GPIO16**
+  * **Touch X-** to **ESP32 A1 GPIO17**
 
-> **Note:** The exact pins for the display's SPI and touch interface may vary depending on the specific library and board configuration, so you may need to adjust your `platformio.ini` file or code to match.
 
------
+> **Note:** A wiring diagram can be found in EternalEscale/Hardware/EternalEscape_Wiring_Diagram.jpg
+
+---
 
 ### **3. Programming the Toy**
 
