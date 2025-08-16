@@ -42,18 +42,18 @@ The project is fully open-source and can be built using common materials and com
 
 ## Assembly
 
-Assembly of this project is very simple, and a full guide can be found in /Hardware/Assembly.md
+Assembly of this project is straightforward, and a full guide can be found in EternalEscape/Assembly.md
 1. **Print the Parts:** Use the provided STL files to 3D print all necessary components.
-2. **Connect Electronics:** Follow the wiring diagram in /Hardware/ to connect the display to the ESP32-S3.
-3. **Upload the Code:** Flash the provided C++ code in /Software/ to the ESP32-S3 using PlatformIO for VScode
+2. **Connect Electronics:** Follow the wiring diagram in EternalEscape/Hardware/ to connect the display to the ESP32-S3.
+3. **Upload the Code:** Flash the provided C++ code in EternalEscape/Software/ to the ESP32-S3 using PlatformIO for VScode
 4. **Put it Together:** Secure the parts using the listed bolts or hot glue.
 
 ---
 
 ## Future Roadmap
 
-- **Networking:** Idk What id do with this, but its something im thinking about.
-- **Fight-Mode:** A snake style fight mmode.
+- **Networking:** Idk What I'd do with this, but it's something I'm thinking about.
+- **Fight-Mode:** A snake-style fight mode.
 - **Smooth Traversal:** Add animations to smooth player traversal from location to location.
 
 ---
