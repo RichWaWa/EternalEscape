@@ -42,11 +42,11 @@ The project is fully open-source and can be built using common materials and com
 
 ## Assembly
 
-Assembly of this project is very simple!
+Assembly of this project is very simple, and a full guide can be found in /Hardware/Assembly.md
 1. **Print the Parts:** Use the provided STL files to 3D print all necessary components.
 2. **Connect Electronics:** Follow the wiring diagram in /Hardware/ to connect the display to the ESP32-S3.
 3. **Upload the Code:** Flash the provided C++ code in /Software/ to the ESP32-S3 using PlatformIO for VScode
-4. **Put it Together:** Secure the parts using the listed bolts or hot glue.   
+4. **Put it Together:** Secure the parts using the listed bolts or hot glue.
 
 ---
 
