@@ -1,9 +1,12 @@
 #ifndef SCREEN_H
 #define SCREEN_H
 
-#include <Adafruit_ILI9341.h>
+// #include <Adafruit_ILI9341.h>
+#include <TFT_eSPI.h>
+#include <SPI.h> // Include the SPI library for communication with the TFT display
+#include <User_Setup.h> // Include the User Setup file for TFT_eSPI configuration
 #include <functional>
-#include "TouchScreen.h"
+// #include "TouchScreen.h"
 
 //Color declararions
 // Colors in 16-bit RGB565 format
@@ -22,30 +25,34 @@ const uint16_t GREY = 0xC618;
 const uint16_t DARKGREY = 0x7BEF;
 
 // TFT display pin definitions
-#define TFT_LITE 10           // Backlight brightness control pin (Drive with PWM)
-#define TFT_CS 9               // Chip select control pin
-#define TFT_DC 6               // Data Command control pin
-#define TFT_RST 5              // Reset pin (could connect to RST pin)
-#define SPI_FREQUENCY 40000000 // 40 MHz
+/*
+#define TFT_LITE 21           // Backlight brightness control pin (Drive with PWM)
+#define TFT_CS 15               // Chip select control pin
+#define TFT_DC 2               // Data Command control pin
+#define TFT_RST -1              // Reset pin (could connect to RST pin)
+#define SPI_FREQUENCY 55000000 // 55 MHz (was 40 MHz, but 55 MHz is more stable for ESP32)
 
 //TFT Display Size
-#define TFT_WIDTH 320
-#define TFT_HEIGHT 240
+#define TFT_WIDTH 320   //240?
+#define TFT_HEIGHT 240  //320?
 
 // Touchscreen pin definitions
-#define TS_YP 14               // Y+ pin (must be an analog pin)
-#define TS_XP 15               // X+ pin
-#define TS_YM 16               // Y- pin
-#define TS_XM 17               // X- pin (must be an analog pin)
+//TODO New TS uses a different chip for these, obsolete?
+#define TS_YP 14                // Y+ pin (must be an analog pin)
+#define TS_XP 15                // X+ pin
+#define TS_YM 16                // Y- pin
+#define TS_XM 17                // X- pin (must be an analog pin)
 
 // Touchscreen calibration values
 //These are needed to map the calibration values.
 //You WILL need to adjust these for your screen. See WIKI
-#define TS_MINX 820            // Default 150
-#define TS_MINY 810            // Default 120
-#define TS_MAXX 960            // Default 920
-#define TS_MAXY 985            // Default 940
+#define TS_MINX 150             // Default 150
+#define TS_MINY 120             // Default 120
+#define TS_MAXX 920             // Default 920
+#define TS_MAXY 940             // Default 940
 #define TS_RES 332             // Touch screen resistance (ADJUST FOR YOUR DISPLAY, But this value may be close enough!)
+*/
+
 // define valid pressure ranges to eliminate error
 // NOTE These will likely need to be adjusted for your display!!!
 #define MINPRESSURE 150
@@ -77,11 +84,13 @@ void togglePlayer2();         // Toggles Player 2 on/off
 // Helper functions
 void drawSimpleButton(String label, String level, int btnX, int btnY);
 void drawText(const char* text, int16_t x, int16_t y, uint16_t color);
+void drawText(const char* text, int16_t x, int16_t y, uint16_t color, uint16_t bgColor);
 void drawFillRectangle(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
 void drawFillScreen(uint16_t color);
 void drawBorderedRectangle(int16_t x, int16_t y, int16_t w, int16_t h, 
     uint16_t borderColor, uint16_t fillColor, uint16_t t);
 void drawTextCentered(const char* text, int16_t centerX, int16_t centerY, uint16_t color);
+void drawTextCentered(const char* text, int16_t centerX, int16_t centerY, uint16_t color, uint16_t bgColor);
 void drawFinishSquare(int16_t x, int16_t y, int16_t cellSize);
 //int loadBrightnessFromSettings();
 void toggleSettingLevel(String& currentSettingLevel, int& currentSettingValue, 

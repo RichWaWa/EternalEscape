@@ -1,5 +1,7 @@
-#include <Adafruit_ILI9341.h> // Include the Adafruit ILI9341 library
-#include "TouchScreen.h" // Include the Adafruit Touchscreen library
+// #include <Adafruit_ILI9341.h> // Include the Adafruit ILI9341 library
+// #include "TouchScreen.h" // Include the Adafruit Touchscreen library
+#include <TFT_eSPI.h> // Include the TFT_eSPI library for ESP32
+#include <SPI.h> // Include the SPI library for communication with the TFT display
 #include "screen.h"     //screen class
 #include "networking.h" //Networking class
 #include "settings.h"   //store device settings
@@ -56,12 +58,12 @@ void setup() {
   Serial.begin(115200);
   analogReadResolution(10);
   srand(time(0));  // Seed random number generator
-  pinMode(TFT_LITE, OUTPUT); //set the PWM output for the backlight
+  pinMode(TFT_BL, OUTPUT); //set the PWM output for the backlight
   initializePreferences();
   //load preferences.
   //waitForSerial();  //debug statement 
   brightnessPWM = loadBrightness();
-  analogWrite(TFT_LITE, brightnessPWM);   //set brightness level
+  analogWrite(TFT_BL, brightnessPWM);   //set brightness level
   playerSpeed = loadPlayerSpeed();
   mazeSpeed = loadMazeSpeed();
   victoryTimeout = loadVictoryTimeout();

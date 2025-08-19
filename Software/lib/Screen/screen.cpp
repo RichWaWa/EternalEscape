@@ -1,9 +1,9 @@
 #include "screen.h"
 #include "settings.h" //Settings are only accessed by sub functions.
 
-// Global variables for TFT and touchscreen
-Adafruit_ILI9341 tft(TFT_CS, TFT_DC, TFT_RST);  // Initialize tft with required pin values
-TouchScreen ts(TS_XP, TS_YP, TS_XM, TS_YM, TS_RES);  // Initialize ts with required pin values and resistance
+
+TFT_eSPI tft = TFT_eSPI(); // TFT_eSPI uses settings from User_Setup.h
+// Touch support: If your display supports touch, use TFT_eSPI's touch API. Otherwise, comment/remove touch code.
 
 //Button Dimentions and vars
 const int16_t btnWidth = 60;  // Width of the rectangle
@@ -63,9 +63,9 @@ const unsigned long debounceDelay = 300; // 300ms debounce delay
 
 // Initialize Display
 void initScreen() {
-    tft.begin(SPI_FREQUENCY);
+    tft.init();
     tft.setRotation(3); //sets the correct screen orientation. (SD card facing down. If you didnt do this, set it to 1)
-    tft.fillScreen(ILI9341_BLACK);  
+    tft.fillScreen(BLACK);  
     //need to load the brightness from the settings
     loadingScreen();    //show the loading screen 
 }
@@ -84,54 +84,43 @@ void initSettingsTextLevels(){
 // Draw the settings screen initially
 void drawSettingsScreen(const String& macAddress, bool wifiStatus) {
     delay(10);  //Small delay to fix issue with Buffer not initializing correctly
-    tft.fillScreen(ILI9341_BLACK);
+    tft.fillScreen(BLACK);
 
     // Draw title
-    drawTextCentered("EternalEscape", (tft.width() / 2), 10, ILI9341_WHITE);
+    drawTextCentered("EternalEscape", (tft.width() / 2), 10, WHITE);
 
     // Draw wifi status
     if (wifiStatus) {
-        drawText("Wifi Connected", 10, 40, ILI9341_GREEN);
+        drawText("Wifi Connected", 10, 40, GREEN);
     } else {
-        drawText("Wifi Disconnected", 10, 40, ILI9341_RED);
+        drawText("Wifi Disconnected", 10, 40, RED);
     }
     wifiStatusLast = wifiStatus;    //update the wifi status
     
     // Draw MAC address
-    drawText("MAC Address:", 10, 60, ILI9341_WHITE);
-    drawText(macAddress.c_str(), 10, 80, ILI9341_WHITE);
+    drawText("MAC Address:", 10, 60, WHITE);
+    drawText(macAddress.c_str(), 10, 80, WHITE);
 
     // Draw brightness toggle
     drawSimpleButton("Brightness:", brightnessLevel, btnBrightnessX, btnBrightnessY);
-    //brightnessLevelLast = brightnessLevel;
     //draw player speed toggle
     drawSimpleButton("PlayerSpeed:", playerSpeedLevel, btnPlayerSpeedX, btnPlayerSpeedY);
-    //playerSpeedLevelLast = playerSpeedLevel;
     //draw maze speed toggle
     drawSimpleButton("MazeSpeed:", mazeSpeedLevel, btnMazeSpeedX, btnMazeSpeedY);
-    //mazeSpeedLevelLast = mazeSpeedLevel;
     //draw victory timeout toggle
     drawSimpleButton("VctryTime:", victoryTimeoutLevel, btnTimeoutX, btnTimeoutY);
-    //victoryTimeoutLevelLast = victoryTimeoutLevel;
     //draw player2 toggle
     drawSimpleButton("Player2:", player2Level, btnPlayer2X, btnPlayer2Y);
-    //player2LevelLast = player2Level;
 }
 
 // Update the settings screen only if anything has changed
 void updateSettingsScreen(const int16_t &x, const int16_t &y, const int16_t &z ,bool wifiStatus) {
     // Update wifi status only if it has changed
     if (wifiStatus != wifiStatusLast) {
-        int16_t x1, y1;
-        uint16_t w, h;
         if (wifiStatus) {
-            drawText("Wifi Connected", 10, 40, ILI9341_GREEN);
-            tft.getTextBounds("Wifi Connected", 0, 0, &x1, &y1, &w, &h);
-            tft.fillRect(x1, y1, w, h, ILI9341_BLACK);
+            drawText("Wifi Connected", 10, 40, GREEN, BLACK); // Draw with background color to clear old text
         } else {
-            drawText("Wifi Disconnected", 10, 40, ILI9341_RED);
-            tft.getTextBounds("Wifi Disconnected", 0, 0, &x1, &y1, &w, &h);
-            tft.fillRect(x1, y1, w, h, ILI9341_BLACK);
+            drawText("Wifi Disconnected", 10, 40, RED, BLACK); // Draw with background color to clear old text
         }
         wifiStatusLast = wifiStatus;
     }
@@ -139,7 +128,7 @@ void updateSettingsScreen(const int16_t &x, const int16_t &y, const int16_t &z ,
     // Update settings if they have changed
     checkButtonTouch(x, y, z, btnBrightnessX, btnBrightnessY, "Brightness", brightnessLevel, []() {
         toggleSettingLevel(brightnessLevel, brightnessPWM, brightnessLevelValues, brightnessLevelsText, 3, [](){
-            analogWrite(TFT_LITE, brightnessPWM); // Set brightness level
+            analogWrite(TFT_BL, brightnessPWM); // Set brightness level
             saveBrightness(brightnessPWM);
         });
     });
@@ -170,18 +159,17 @@ void updateSettingsScreen(const int16_t &x, const int16_t &y, const int16_t &z ,
 
 // Get touch points
 void getTouchPoints(int16_t& x, int16_t& y, int16_t& z) {
-    TSPoint touchPoint = ts.getPoint();
-    // Map x and y to origin at top left corner.
-    //NOTE
-    //TFT_WIDTH 320
-    //TFT_HEIGHT 240
-    //Note, the screens touchpoint mapping is different from how we have it installed!
-    y = map(touchPoint.x, TS_MINY, TS_MAXY, 0, tft.width());
-    x = map(touchPoint.y, TS_MINX, TS_MAXX, 0, tft.height()); 
-    z = abs(touchPoint.z);
-    //transformations to touchpoints  
-    x = (tft.height() - x) + touchPointShiftX;   //invert X-Axis 
-    y = y + touchPointShifty;
+    // Use TFT_eSPI's touch API
+    uint16_t tx, ty;
+    bool touched = tft.getTouch(&tx, &ty);
+    if (touched) {
+        // Map tx, ty to your coordinate system if needed
+        x = (tft.height() - tx) + touchPointShiftX; // invert X-Axis and apply shift
+        y = ty + touchPointShifty;                  // apply Y shift
+        z = 1; // Touch detected
+    } else {
+        x = y = z = 0; // No touch detected
+    }
 
     //Uncomment these lines to read the touchscreen printouts!
     /*
@@ -233,18 +221,18 @@ void checkButtonTouch(const int16_t &x, const int16_t &y, const int16_t &z, int1
 
 void loadingScreen() {
     // Clear the screen
-    tft.fillScreen(ILI9341_BLACK);
+    tft.fillScreen(BLACK);
 
     // Draw "EternalEscape" text
     tft.setTextSize(4);
-    tft.setFont();
-    tft.setTextColor(ILI9341_WHITE);
-    drawTextCentered("EternalEscape", tft.width() / 2, tft.height() / 2 - 20, ILI9341_WHITE);
+    tft.setTextFont(1); // Use default font
+    tft.setTextColor(WHITE);
+    drawTextCentered("EternalEscape", tft.width() / 2, tft.height() / 2 - 20, WHITE);
 
     // Draw "Loading..." text
     tft.setTextSize(2);
-    tft.setTextColor(ILI9341_DARKGREY);
-    drawTextCentered("Loading...", tft.width() / 2, tft.height() / 2 + 20, ILI9341_DARKGREY);
+    tft.setTextColor(DARKGREY);
+    drawTextCentered("Loading...", tft.width() / 2, tft.height() / 2 + 20, DARKGREY);
 }
 
 
@@ -312,14 +300,22 @@ void drawSimpleButton(String label, String level, int btnX, int btnY) {
     //Caculate offsets (for shifting text over)
     const int labelYOffset = +3;
 
-    drawText(label.c_str(), btnX-140, btnY + labelYOffset, ILI9341_WHITE);               // Draw label
-    drawFillRectangle(btnX, btnY, btnWidth, btnHeight, ILI9341_WHITE);                 // Draw button rectangle
-    drawTextCentered(level.c_str(), btnX + (btnWidth / 2), btnY + (btnHeight / 2), ILI9341_BLACK); // Centered text
+    drawText(label.c_str(), btnX-140, btnY + labelYOffset, WHITE);               // Draw label
+    drawFillRectangle(btnX, btnY, btnWidth, btnHeight, WHITE);                 // Draw button rectangle
+    drawTextCentered(level.c_str(), btnX + (btnWidth / 2), btnY + (btnHeight / 2), BLACK); // Centered text
 }
 
+// Overloaded drawText: without background color
 void drawText(const char* text, int16_t x, int16_t y, uint16_t color) {
     tft.setCursor(x, y);
     tft.setTextColor(color);
+    tft.setTextSize(2);
+    tft.print(text);
+}
+// Overloaded drawText: with background color
+void drawText(const char* text, int16_t x, int16_t y, uint16_t color, uint16_t bgColor) {
+    tft.setCursor(x, y);
+    tft.setTextColor(color, bgColor);
     tft.setTextSize(2);
     tft.print(text);
 }
@@ -347,13 +343,25 @@ void drawBorderedRectangle(int16_t x, int16_t y, int16_t w, int16_t h,
 
 //draws centered text
 void drawTextCentered(const char* text, int16_t centerX, int16_t centerY, uint16_t color) {
-    int16_t x1, y1;
-    uint16_t w, h;
-    tft.setTextSize(2); // Set the text first to ensure getTextBounds returns the correct value
-    tft.setFont();      // Ensure the default font is selected
-    tft.getTextBounds(text, 0, 0, &x1, &y1, &w, &h);
+    tft.setTextSize(2);
+    tft.setTextFont(1);
+    // Calculate the width and height of the text
+    int w = tft.textWidth(text);
+    int h = 16 * tft.textsize; // Approximate height for font 1, textsize 2
     tft.setCursor(centerX - (w / 2), centerY - (h / 2));
     tft.setTextColor(color);
+    tft.print(text);
+}
+
+// Overload: centered text with background color
+void drawTextCentered(const char* text, int16_t centerX, int16_t centerY, uint16_t color, uint16_t bgColor) {
+    tft.setTextSize(2);
+    tft.setTextFont(1);
+    // Calculate text width and height
+    int w = tft.textWidth(text);
+    int h = 16 * tft.textsize;  // Approximate height for font 1, textsize 2
+    tft.setCursor(centerX - (w / 2), centerY - (h / 2));
+    tft.setTextColor(color, bgColor);
     tft.print(text);
 }
 
