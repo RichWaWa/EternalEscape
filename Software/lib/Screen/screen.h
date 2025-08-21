@@ -4,6 +4,7 @@
 // #include <Adafruit_ILI9341.h>
 #include <TFT_eSPI.h>
 #include <SPI.h> // Include the SPI library for communication with the TFT display
+#include <XPT2046_Touchscreen.h> // Include the XPT2046 Touchscreen library for touch input
 #include <User_Setup.h> // Include the User Setup file for TFT_eSPI configuration
 #include <functional>
 // #include "TouchScreen.h"
@@ -24,39 +25,30 @@ const uint16_t DARKBLUE = 0x000C;   // Dark Blue Player Trail
 const uint16_t GREY = 0xC618; 
 const uint16_t DARKGREY = 0x7BEF;
 
-// TFT display pin definitions
-/*
-#define TFT_LITE 21           // Backlight brightness control pin (Drive with PWM)
-#define TFT_CS 15               // Chip select control pin
-#define TFT_DC 2               // Data Command control pin
-#define TFT_RST -1              // Reset pin (could connect to RST pin)
-#define SPI_FREQUENCY 55000000 // 55 MHz (was 40 MHz, but 55 MHz is more stable for ESP32)
-
-//TFT Display Size
-#define TFT_WIDTH 320   //240?
-#define TFT_HEIGHT 240  //320?
-
 // Touchscreen pin definitions
-//TODO New TS uses a different chip for these, obsolete?
-#define TS_YP 14                // Y+ pin (must be an analog pin)
-#define TS_XP 15                // X+ pin
-#define TS_YM 16                // Y- pin
-#define TS_XM 17                // X- pin (must be an analog pin)
+// The CYD touch uses some non default
+// SPI pins
+#define XPT2046_IRQ 36
+#define XPT2046_MOSI 32
+#define XPT2046_MISO 39
+#define XPT2046_CLK 25
+#define XPT2046_CS 33
 
 // Touchscreen calibration values
-//These are needed to map the calibration values.
-//You WILL need to adjust these for your screen. See WIKI
-#define TS_MINX 150             // Default 150
-#define TS_MINY 120             // Default 120
-#define TS_MAXX 920             // Default 920
-#define TS_MAXY 940             // Default 940
-#define TS_RES 332             // Touch screen resistance (ADJUST FOR YOUR DISPLAY, But this value may be close enough!)
-*/
+// These are needed to map the calibration values.
+// You WILL need to adjust these for your screen. See assembly guide for more information.
+//TODO  I want to add these to a first time setup calibration. 
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 240
+#define TOUCH_MIN_X 200
+#define TOUCH_MAX_X 3600
+#define TOUCH_MIN_Y 400
+#define TOUCH_MAX_Y 3600
 
 // define valid pressure ranges to eliminate error
 // NOTE These will likely need to be adjusted for your display!!!
 #define MINPRESSURE 150
-#define MAXPRESSURE 2000
+#define MAXPRESSURE 3000
 
 // Initialization functions
 void initScreen();

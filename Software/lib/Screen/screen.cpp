@@ -1,9 +1,10 @@
 #include "screen.h"
 #include "settings.h" //Settings are only accessed by sub functions.
 
-
+// Touchscreen SPI setup
+SPIClass mySpi = SPIClass(VSPI);
+XPT2046_Touchscreen ts(XPT2046_CS, XPT2046_IRQ); // Touchscreen uses the XPT2046 chip
 TFT_eSPI tft = TFT_eSPI(); // TFT_eSPI uses settings from User_Setup.h
-// Touch support: If your display supports touch, use TFT_eSPI's touch API. Otherwise, comment/remove touch code.
 
 //Button Dimentions and vars
 const int16_t btnWidth = 60;  // Width of the rectangle
@@ -11,8 +12,8 @@ const int16_t btnHeight = 24; // Height of the rectangle
 const int16_t xShift = 80;      // number to shift the alt text by.
 
 //touchpoint shifts
-const int16_t touchPointShiftX = +60;
-const int16_t touchPointShifty = -30;
+const int16_t touchPointShiftX = 0;
+const int16_t touchPointShifty = 0;
 
 //misc vars
 bool wifiStatusLast = false;        //tracks whether the wifi status has changed or not 
@@ -63,8 +64,11 @@ const unsigned long debounceDelay = 300; // 300ms debounce delay
 
 // Initialize Display
 void initScreen() {
+    // Start the SPI for the touch screen and init the TS library
+    mySpi.begin(XPT2046_CLK, XPT2046_MISO, XPT2046_MOSI, XPT2046_CS);
+    ts.begin(mySpi);
     tft.init();
-    tft.setRotation(3); //sets the correct screen orientation. (SD card facing down. If you didnt do this, set it to 1)
+    tft.setRotation(1); //sets the correct screen orientation. (SD card facing down. If you didnt do this, set it to 1)
     tft.fillScreen(BLACK);  
     //need to load the brightness from the settings
     loadingScreen();    //show the loading screen 
@@ -159,39 +163,22 @@ void updateSettingsScreen(const int16_t &x, const int16_t &y, const int16_t &z ,
 
 // Get touch points
 void getTouchPoints(int16_t& x, int16_t& y, int16_t& z) {
-    // Use TFT_eSPI's touch API
-    uint16_t tx, ty;
-    bool touched = tft.getTouch(&tx, &ty);
-    if (touched) {
+    TS_Point touchPoint = ts.getPoint();
+    if (ts.tirqTouched() && ts.touched()) {
         // Map tx, ty to your coordinate system if needed
-        x = (tft.height() - tx) + touchPointShiftX; // invert X-Axis and apply shift
-        y = ty + touchPointShifty;                  // apply Y shift
-        z = 1; // Touch detected
+        x = map(touchPoint.x, TOUCH_MIN_X, TOUCH_MAX_X, 0, SCREEN_WIDTH - 1) + touchPointShiftX; 
+        y = map(touchPoint.y, TOUCH_MIN_Y, TOUCH_MAX_Y, 0, SCREEN_HEIGHT - 1) + touchPointShifty;                 
+        z = touchPoint.z;
+        Serial.printf("Raw: x=%d, y=%d, z=%d\n", x, y, z);
     } else {
         x = y = z = 0; // No touch detected
     }
 
     //Uncomment these lines to read the touchscreen printouts!
-    /*
     if (z > MINPRESSURE && z < MAXPRESSURE) {
-        Serial.print("Touch detected at: ");
-        Serial.print("X=");
-        Serial.print(touchPoint.x);
-        Serial.print(", Y=");
-        Serial.print(touchPoint.y);
-        Serial.print(", Z=");
-        Serial.println(touchPoint.z);
-
-        //These lines are to confirm the mapped touch points
-        Serial.print("Mapped Touch detected at: ");
-        Serial.print("X=");
-        Serial.print(x);
-        Serial.print(", Y=");
-        Serial.print(y);
-        Serial.print(", Z=");
-        Serial.println(z);
+        Serial.print("Z is within pressure range: ");
+        Serial.print(z);
     }
-    */
     
 }
 
@@ -210,8 +197,8 @@ void checkButtonTouch(const int16_t &x, const int16_t &y, const int16_t &z, int1
                 }
 
                 // Update the button appearance
-                drawFillRectangle(btnX, btnY, btnWidth, btnHeight, ILI9341_WHITE);
-                drawTextCentered(settingLevel.c_str(), btnX + (btnWidth / 2), btnY + (btnHeight / 2), ILI9341_BLACK);
+                drawFillRectangle(btnX, btnY, btnWidth, btnHeight, WHITE);
+                drawTextCentered(settingLevel.c_str(), btnX + (btnWidth / 2), btnY + (btnHeight / 2), BLACK);
 
                 lastTouchTime = currentTime;
             }
@@ -347,7 +334,7 @@ void drawTextCentered(const char* text, int16_t centerX, int16_t centerY, uint16
     tft.setTextFont(1);
     // Calculate the width and height of the text
     int w = tft.textWidth(text);
-    int h = 16 * tft.textsize; // Approximate height for font 1, textsize 2
+    int h = 6 * tft.textsize; // Approximate height for font 1, textsize 2
     tft.setCursor(centerX - (w / 2), centerY - (h / 2));
     tft.setTextColor(color);
     tft.print(text);
@@ -359,7 +346,7 @@ void drawTextCentered(const char* text, int16_t centerX, int16_t centerY, uint16
     tft.setTextFont(1);
     // Calculate text width and height
     int w = tft.textWidth(text);
-    int h = 16 * tft.textsize;  // Approximate height for font 1, textsize 2
+    int h = 6 * tft.textsize;  // Approximate height for font 1, textsize 2
     tft.setCursor(centerX - (w / 2), centerY - (h / 2));
     tft.setTextColor(color, bgColor);
     tft.print(text);
@@ -370,16 +357,16 @@ void drawFinishSquare(int16_t x, int16_t y, int16_t cellSize){
     int16_t halfCell = cellSize / 2; // Calculate half of the cell size for rows and columns
 
     // Draw the black background
-    drawFillRectangle(x, y, cellSize, cellSize, ILI9341_BLACK); // Black background
+    drawFillRectangle(x, y, cellSize, cellSize, BLACK); // Black background
 
     // Draw the white checkered pattern
     for (int16_t row = 0; row < cellSize; row += 4) { // Step by 4 pixels (2 for each white square)
         for (int16_t col = 0; col < cellSize; col += 4) {
             // Top-left square of the 4x4 grid
-            drawFillRectangle(x + col, y + row, 2, 2, ILI9341_WHITE); // White square
+            drawFillRectangle(x + col, y + row, 2, 2, WHITE); // White square
             // Bottom-right square of the 4x4 grid
             if (col + 2 < cellSize && row + 2 < cellSize) {
-                drawFillRectangle(x + col + 2, y + row + 2, 2, 2, ILI9341_WHITE); // White square
+                drawFillRectangle(x + col + 2, y + row + 2, 2, 2, WHITE); // White square
             }
         }
     }
